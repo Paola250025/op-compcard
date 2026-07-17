@@ -264,7 +264,7 @@
     </div>
 
     <div class="app-foot">
-      <div class="foot-note">All values shown are estimates only — not an appraisal or an offer.</div>
+      <div class="foot-note">All values shown are estimates only. Not an appraisal or an offer.</div>
       Homes Buy Olaf &amp; Paola · Private tool
     </div>
   </div>
@@ -399,8 +399,8 @@ async function searchAddr(){
     const headers = { "X-Api-Key": getKey() };
     const enc = encodeURIComponent(q);
     const [valRes, rentRes, propRes] = await Promise.all([
-      fetch(API_BASE+"/avm/value?address="+enc, {headers}),
-      fetch(API_BASE+"/avm/rent/long-term?address="+enc, {headers}).catch(()=>null),
+      fetch(API_BASE+"/avm/value?address="+enc+"&lookupSubjectAttributes=true", {headers}),
+      fetch(API_BASE+"/avm/rent/long-term?address="+enc+"&lookupSubjectAttributes=true", {headers}).catch(()=>null),
       fetch(API_BASE+"/properties?address="+enc, {headers}).catch(()=>null)
     ]);
     bumpUsage();
