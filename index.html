@@ -93,7 +93,12 @@
   .empty-state .es-title{font-family:var(--serif); font-size:16px; color:var(--ink); margin:0 0 4px}
   .empty-state .es-sub{font-size:12.5px; color:var(--ink-soft); margin:0}
   .app-foot{text-align:center; padding:22px 16px 30px; color:var(--taupe); font-size:10px; letter-spacing:.22em; text-transform:uppercase; font-weight:600}
-  .app-foot .foot-note{font-size:11px; letter-spacing:0; text-transform:none; font-weight:400; font-style:italic; color:var(--ink-soft); margin-bottom:10px; line-height:1.5}
+  .app-foot .foot-note{font-size:11px; letter-spacing:0; text-transform:none; font-weight:400; font-style:italic; color:var(--ink-soft); margin-top:14px; line-height:1.5}
+  .app-foot .contact{text-transform:none; letter-spacing:0; font-weight:400}
+  .app-foot .contact-name{font-family:var(--serif); font-size:15px; color:var(--ink); margin-bottom:8px; letter-spacing:.01em}
+  .app-foot .contact-line{font-size:12.5px; color:var(--ink-soft); margin:3px 0}
+  .app-foot .contact-line a{color:var(--slate); text-decoration:none; font-weight:500}
+  .app-foot .contact-line a:hover{text-decoration:underline}
   .err{color:var(--bad); font-size:14px; margin-top:10px}
   .warn{color:var(--gold); font-size:12.5px; margin-top:8px}
 
@@ -270,8 +275,13 @@
     </div>
 
     <div class="app-foot">
+      <div class="contact">
+        <div class="contact-name">Olaf &amp; Paola · Homes Buy Olaf</div>
+        <div class="contact-line"><a href="tel:5622336523">Olaf 562-233-6523</a> &nbsp;·&nbsp; <a href="mailto:oek@homesbuyolaf.com">oek@homesbuyolaf.com</a></div>
+        <div class="contact-line"><a href="tel:9292452908">Paola 929-245-2908</a> &nbsp;·&nbsp; <a href="mailto:paola@homesbuyolaf.com">paola@homesbuyolaf.com</a></div>
+        <div class="contact-line"><a href="https://homesbuyolaf.com" target="_blank" rel="noopener">homesbuyolaf.com</a></div>
+      </div>
       <div class="foot-note">All values shown are estimates only. Not an appraisal or an offer.</div>
-      Homes Buy Olaf &amp; Paola · Private tool
     </div>
   </div>
 </div>
@@ -588,7 +598,7 @@ function buildShareCanvas(){
   const cv=document.createElement('canvas');
   const pad=70;
   // measure height dynamically-ish with a fixed generous layout
-  const H=1350;
+  const H=1440;
   cv.width=W*scale; cv.height=H*scale;
   const ctx=cv.getContext('2d'); ctx.scale(scale,scale);
   // bg
@@ -645,14 +655,25 @@ function buildShareCanvas(){
     ctx.textAlign="center"; y+=48;
   }
   if(p.rent) row("Est. rent", money(p.rent)+"/mo");
-  row("HOA", p.hoa!=null? money(p.hoa)+"/mo" : "—");
-  row("Taxes", p.tax!=null? money(p.tax)+"/yr" : "—");
+  if(p.hoa!=null) row("HOA", money(p.hoa)+"/mo");
+  if(p.tax!=null) row("Taxes", money(p.tax)+"/yr");
   if(current._payment) row("Est. monthly payment", money(current._payment));
+
+  // contact footer
+  let cy=H-220;
+  ctx.strokeStyle="#e7e1d8"; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(pad,cy-36); ctx.lineTo(W-pad,cy-36); ctx.stroke();
+  ctx.textAlign="center";
+  ctx.font='800 25px system-ui,-apple-system,sans-serif'; ctx.fillStyle="#5f7a87";
+  ctx.fillText("OLAF & PAOLA · HOMES BUY OLAF", cx, cy);
+  ctx.font='500 22px system-ui,sans-serif'; ctx.fillStyle="#2b2926";
+  ctx.fillText("Olaf 562-233-6523      Paola 929-245-2908", cx, cy+38);
+  ctx.font='400 21px system-ui,sans-serif'; ctx.fillStyle="#6f6a63";
+  ctx.fillText("paola@homesbuyolaf.com   ·   homesbuyolaf.com", cx, cy+70);
 
   // disclaimer
   ctx.font='italic 18px Georgia,serif'; ctx.fillStyle="#8a8178";
-  const dl = wrapText(ctx, "Approximate figures, for reference only. Not an appraisal or an offer.", W-2*pad);
-  y=H-90; dl.forEach(l=>{ ctx.fillText(l, cx, y); y+=26; });
+  const dl = wrapText(ctx, "Estimates only. Not an appraisal or an offer.", W-2*pad);
+  y=H-52; dl.forEach(l=>{ ctx.fillText(l, cx, y); y+=26; });
 
   try{ cv.toBlob(b=>{ lastShareBlob=b; }, "image/png"); }catch(e){}
   return cv.toDataURL("image/png");
