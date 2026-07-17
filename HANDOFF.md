@@ -1,74 +1,70 @@
 # O&P CompCard — Handoff / Status
 
-_Last updated: 2026-07-16. Read this first when picking the project back up._
+_Read this first when picking the project back up._
 
-## Status: LIVE ✅ and working end-to-end
+## Status: LIVE ✅ and in daily use
 
-- **Live at:** https://card.homesbuyolaf.com (HTTPS cert still finishing the first
-  time — `http://card.homesbuyolaf.com` works now; enable "Enforce HTTPS" once
-  available).
+- **Live at:** https://card.homesbuyolaf.com (HTTPS working; installed to Paola's iPhone home screen as an app).
 - **Repo:** github.com/Paola250025/op-compcard (public, GitHub Pages, `main` / root).
-- **Custom domain:** `card.homesbuyolaf.com` — CNAME record lives in the
-  **homesbuyolaf.com** GoDaddy DNS (`card` → `paola250025.github.io`). DNS check
-  passed. (Note: a `card` record was also mistakenly added to paolaadventurer.com
-  earlier — harmless, can be ignored or deleted.)
-- **Password:** `Flecha25` (stored only as a SHA-256 hash in the code).
-- **RentCast:** free Developer plan active. API key is entered once per device via
-  the ⚙ Settings screen and saved in that browser only — never in the repo.
-- **Verified:** tested with a real address (30 Cascada, Rancho Santa Margarita, CA)
-  — real estimate, comps, HOA, taxes, and calculator all worked.
+- **Password:** `Flecha25` (only the SHA-256 hash is in the code).
+- **RentCast:** free Developer plan. API key entered once per device (⚙ Settings), stored in
+  localStorage + a long-lived cookie (survives cache clears); the app also requests persistent
+  storage. It should not keep re-asking for the key. (Note: http:// and https:// are separate
+  origins — the key must be entered under the https app, which is the installed one.)
+- **Verified working** end-to-end with real addresses.
 
-## Done (Fase 1)
+## Features (all built & live)
 
-- Address search via RentCast
-- Comps sheet (subject + up to 4 comps, $/sqft)
-- **Comp-based price range** (median $/sqft for center, min/max for the range) with
-  RentCast's AVM shown as a secondary reference — tighter and more defensible
-- Money flags: HOA, taxes, assessment, non-warrantable (auto when available, manual
-  field when not)
-- HOA vs comps comparison
-- Payment calculator (down payment + rate → loan + taxes + HOA + insurance)
-- Save homes for ~2 days (auto-delete), recent list on home screen
-- Share button (see pending #3)
-- Homes Buy Olaf & Paola branding + password gate + per-device API key
+- Address search → RentCast value + rent + property, with `lookupSubjectAttributes=true` for accuracy.
+- **Comp-based price range** (median $/sqft, min/max) + RentCast AVM shown as reference. Range uses "to", not a dash.
+- **Editable beds/baths/sqft** with an **Update** button that re-queries RentCast for a closer estimate.
+- **Rental estimate** in its own section; the rent number is **editable** (tap to correct). Feeds the share image.
+- **Comps** show a **Sold / Active / Pending** status chip each.
+- **Competition (market view):** on-demand button "See active & pending within 1 mile" → RentCast
+  `/listings/sale` by lat/long + 1 mile radius → summary (X active · Y pending) + list with DOM.
+  On-demand to save free-tier lookups.
+- **Costs & flags:** HOA, taxes, assessment, non-warrantable (auto when available, manual otherwise). HOA-vs-comps chip.
+- **Fully editable payment calculator** (price, down, rate, taxes, HOA, insurance).
+- **Save homes** for ~2 days (localStorage; warns if a Private window blocks saving).
+- **Share = real PNG image** (canvas) with branding, the home, range, rent, HOA/taxes/payment,
+  the **Olaf & Paola contact block** (phones/emails/website), and an "estimates only" disclaimer.
+  Native share sheet when available, otherwise downloads. Contact is ONLY on the client image (not in the app UI).
+- **PWA:** manifest + chess-piece app icon (rook/queen/knight) so it installs like an app.
+- Brand: Homes Buy Olaf & Paola wordmark + chess motif + slate palette + Fraunces serif.
 
-## Pending for tomorrow
+## Contact info used (on the client share image)
+- Olaf 562-233-6523 · oek@homesbuyolaf.com
+- Paola 929-245-2908 · paola@homesbuyolaf.com
+- homesbuyolaf.com
 
-1. **Enforce HTTPS** — once GitHub issues the cert, check "Enforce HTTPS" in
-   Settings → Pages so `https://` works and `http` redirects.
-2. **Real logo** — the chess-piece Homes Buy Olaf logo needs to be attached as a
-   file (PNG transparent or SVG). Right now only the text wordmark shows. Place it
-   above the wordmark and on the share card.
-3. **Share = actual image** — the Share button currently uses the phone's share
-   sheet with text / copies text. To produce a real PNG image to send on WhatsApp,
-   add image capture (inline html2canvas or draw to Canvas). Decide + build.
-4. **Olaf's phone** — enter the password once and paste the RentCast key once on
-   Olaf's device.
-5. **Field-mapping check** — try several more addresses and confirm HOA / taxes /
-   assessment populate. If any are blank when they shouldn't be, adjust
-   `mapProperty()` in index.html to RentCast's real field names. Non-warrantable and
-   special assessments are manual-only (no API has them).
+## Open items / to verify next session
 
-## Ground rules / decisions
+1. **Comp & listing status accuracy** — the Sold/Active/Pending labels and the competition list are
+   read from RentCast fields and normalized in `compStatus()` / `loadMarket()`. NOT verified against a
+   live RentCast response (this environment can't reach RentCast). Paola should check: do comps show the
+   right status? does "See active & pending" return listings and split them correctly? If a status is wrong
+   or Pending never shows, adjust the field mapping in `compStatus()` (RentCast may name Pending differently)
+   and the `/listings/sale` query in `loadMarket()`.
+2. **"Sold in 90 days"** — Paola asked for solds closed within 90 days. Current comps come from the AVM
+   (recent comparable sales) with status chips, but they are NOT explicitly filtered to a 90-day window
+   (the AVM comp date field wasn't confirmed). If needed, filter comps by their sale/removed date ≤ 90 days.
+3. **Free-tier budget** — each search uses ~3 lookups (value + rent + properties); the market button adds 1.
+   50/month free. If she needs more volume, RentCast paid is $74/mo — but then move the key server-side
+   (e.g. Cloudflare) since a public GitHub repo can't hide it.
+4. **Olaf's phone** — have Olaf open the https app, enter Flecha25 + the RentCast key once, add to home screen.
+5. Optional polish: real chess logo file if Paola ever sends the PNG/SVG (currently recreated in code).
 
-- Stay on the **RentCast free plan** (50 lookups/month). The key sits in the
-  browser of a public-repo app, so free-only means an exposed key can never cause
-  charges. If you ever need more volume, move hosting to something that hides the
-  key server-side (e.g. Cloudflare Pages) before upgrading.
-- Data is RentCast only (which is built from public records + listings). No second
-  source planned.
-- Clients never see this URL — they only receive the shared card/image. That's why
-  the internal domain doesn't matter to them.
+## Verifying logic locally
+`node --check` the extracted `<script>`; a small harness in /tmp tested mapProperty + calc numbers
+(comp range, rent, monthly payment) and they were correct. The RentCast calls themselves can only be
+tested in Paola's browser.
 
-## Files in this repo
-
-- `index.html` — the whole app (HTML + CSS + JS, no dependencies).
-- `CNAME` — custom domain config (`card.homesbuyolaf.com`).
-- `README.md` — setup steps.
-- `HANDOFF.md` — this file.
+## Files
+- `index.html` — the whole app. `manifest.json`, `apple-touch-icon.png`, `assets/icon-*.png` — PWA.
+- `CNAME` — card.homesbuyolaf.com. `README.md`, this `HANDOFF.md`.
 - `docs/roadmap.md`, `docs/spec-fase-1.md`, `docs/plan-fase-1.md` — planning.
 
-## Fase 2 (later)
-
-Sync saved homes between Olaf & Paola (needs a server), HOA-by-city table that grows
-with use, automatic daily interest rate, full CRM. See `docs/roadmap.md`.
+## Other project in flight
+The **Archery From Zero** sales page (Paola Adventurer brand) is built and committed on branch
+`claude/archery-website-requirements-8yk46i` of the **Bear-Card** repo, at `archery/index.html`
+(would serve at paolaadventurer.com/archery). Waiting on the Payhip checkout link + photos before launch.
