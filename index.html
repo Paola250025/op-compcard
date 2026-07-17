@@ -7,6 +7,9 @@
 <meta name="description" content="Private comps and cost tool for Homes Buy Olaf & Paola.">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#5f7a87">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#ffffff; --cream:#faf8f4; --panel:#ffffff;
@@ -14,8 +17,9 @@
     --taupe:#8a8178; --slate:#5f7a87; --slate-deep:#4c6570; --wm-gray:#9aa1a5;
     --good:#3f7d55; --good-bg:#eaf3ec; --bad:#b1543a; --bad-bg:#f6ece7;
     --gold:#a98d5d;
-    --shadow:0 4px 18px rgba(43,41,38,.08);
-    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --shadow:0 6px 24px rgba(43,41,38,.07);
+    --shadow-lg:0 12px 40px -8px rgba(43,41,38,.14);
+    --serif:"Fraunces","Iowan Old Style",Palatino,Georgia,serif;
     --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
   }
   *{box-sizing:border-box}
@@ -37,10 +41,15 @@
   .screen{padding:20px 18px 40px}
   .eyebrow{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--taupe); font-weight:600}
 
-  .lock{min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:40px 24px; text-align:center}
-  .lock h2{font-family:var(--sans); font-weight:800; letter-spacing:.06em; font-size:18px; margin:0; color:var(--wm-gray)}
+  .lock{min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; padding:32px 22px; text-align:center;
+    background:radial-gradient(125% 80% at 50% 0%, #f2eee6 0%, var(--cream) 52%, #eaeeed 100%);}
+  .lock-card{background:var(--bg); border:1px solid var(--line); border-radius:24px; box-shadow:var(--shadow-lg); padding:40px 30px 34px; width:100%; max-width:360px}
+  .emblem{width:74px; height:74px; margin:0 auto 20px; border-radius:50%; background:linear-gradient(155deg,var(--slate),var(--slate-deep)); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-size:25px; font-weight:600; box-shadow:var(--shadow)}
+  .lock h2{font-family:var(--sans); font-weight:800; letter-spacing:.05em; font-size:17px; margin:0 0 6px; color:var(--wm-gray)}
   .lock h2 .buy{color:var(--slate)} .lock h2 .amp{color:var(--slate)}
-  .lock p{color:var(--ink-soft); font-size:14px; margin:0}
+  .lock .tagline{font-size:9px; letter-spacing:.28em; text-transform:uppercase; color:var(--taupe); font-weight:600; margin:0 0 20px}
+  .lock p.hint{color:var(--ink-soft); font-size:13px; margin:0 0 18px}
+  .lock-foot{margin-top:22px; font-size:11px; color:var(--taupe); letter-spacing:.05em}
   input,.field{font-family:var(--sans); font-size:16px}
   input[type=text],input[type=password],input[type=number]{
     width:100%; padding:13px 14px; border:1px solid var(--line); border-radius:12px; background:var(--cream); color:var(--ink);}
@@ -67,15 +76,21 @@
   .recent .meta{font-size:12px; color:var(--ink-soft)}
   .recent .open{font-size:12px; color:var(--slate); border:none; background:none; text-transform:uppercase; letter-spacing:.08em; font-weight:600}
   .empty-note{color:var(--ink-soft); font-size:13px; font-style:italic}
+  .home-intro{color:var(--ink-soft); font-size:13.5px; margin:7px 0 2px}
+  .empty-state{border:1.5px dashed var(--line); border-radius:16px; padding:26px 18px; text-align:center; background:var(--cream)}
+  .empty-state .es-mark{width:40px; height:40px; margin:0 auto 10px; border-radius:12px; background:var(--bg); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; color:var(--slate)}
+  .empty-state .es-title{font-family:var(--serif); font-size:16px; color:var(--ink); margin:0 0 4px}
+  .empty-state .es-sub{font-size:12.5px; color:var(--ink-soft); margin:0}
+  .app-foot{text-align:center; padding:22px 16px 30px; color:var(--taupe); font-size:10px; letter-spacing:.22em; text-transform:uppercase; font-weight:600}
   .err{color:var(--bad); font-size:14px; margin-top:10px}
 
-  .subject{background:var(--cream); border:1px solid var(--line); border-radius:16px; padding:18px; box-shadow:var(--shadow)}
-  .subject .addr{font-family:var(--serif); font-size:18px; font-weight:600; margin:0}
-  .subject .facts{display:flex; gap:14px; flex-wrap:wrap; margin-top:6px; color:var(--ink-soft); font-size:13px}
-  .range{margin-top:14px; padding-top:14px; border-top:1px solid var(--line); text-align:center}
-  .range .eyebrow{display:block; margin-bottom:4px}
-  .range .val{font-family:var(--serif); font-size:26px; font-weight:600; color:var(--ink)}
-  .range .est{font-size:12px; color:var(--ink-soft); margin-top:2px}
+  .subject{background:linear-gradient(180deg,#fffdfb,var(--cream)); border:1px solid var(--line); border-radius:20px; padding:24px 22px; box-shadow:var(--shadow-lg)}
+  .subject .addr{font-family:var(--serif); font-size:20px; font-weight:500; margin:0; line-height:1.25; letter-spacing:-.005em}
+  .subject .facts{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px; color:var(--ink-soft); font-size:13px}
+  .range{margin-top:18px; padding-top:18px; border-top:1px solid var(--line); text-align:center}
+  .range .eyebrow{display:block; margin-bottom:8px}
+  .range .val{font-family:var(--serif); font-size:32px; font-weight:500; color:var(--ink); letter-spacing:-.015em; line-height:1.1}
+  .range .est{font-size:12px; color:var(--ink-soft); margin-top:6px}
 
   .comps{width:100%; border-collapse:collapse; margin-top:8px; font-size:13px}
   .comps th,.comps td{text-align:right; padding:9px 8px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums}
@@ -118,13 +133,16 @@
 
   <!-- LOCK -->
   <div id="lockScreen" class="lock">
-    <h2>HOMES<span class="buy">BUY</span> OLAF <span class="amp">&amp;</span> PAOLA</h2>
-    <p>O&amp;P CompCard — private tool.</p>
-    <div style="width:100%; max-width:280px">
+    <div class="lock-card">
+      <div class="emblem">O&amp;P</div>
+      <h2>HOMES<span class="buy">BUY</span> OLAF <span class="amp">&amp;</span> PAOLA</h2>
+      <p class="tagline">Make the right move</p>
+      <p class="hint">O&amp;P CompCard — private tool for you and Olaf.</p>
       <input type="password" id="pwInput" placeholder="Password" autocomplete="off" onkeydown="if(event.key==='Enter')unlock()">
       <button class="btn" style="margin-top:10px" onclick="unlock()">Enter</button>
       <p id="pwErr" class="err hidden">Wrong password</p>
     </div>
+    <p class="lock-foot">Comps · Costs · Payments — in seconds</p>
   </div>
 
   <!-- MAIN -->
@@ -148,6 +166,7 @@
     <!-- HOME -->
     <div id="homeScreen" class="screen">
       <span class="eyebrow">Search a property</span>
+      <p class="home-intro">Type any address to see its value range, comps, HOA &amp; taxes, and a payment estimate.</p>
       <div class="search-wrap">
         <input type="text" id="addrInput" placeholder="Address, City, ST" onkeydown="if(event.key==='Enter')searchAddr()">
         <button class="btn" onclick="searchAddr()">Search</button>
@@ -156,7 +175,11 @@
 
       <div class="section-label"><span class="eyebrow">Recent homes</span></div>
       <ul id="recentList" class="recent"></ul>
-      <p id="recentEmpty" class="empty-note">No saved homes yet. They're kept at least 2 days.</p>
+      <div id="recentEmpty" class="empty-state">
+        <div class="es-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg></div>
+        <p class="es-title">No saved homes yet</p>
+        <p class="es-sub">Search an address, then tap “Save home.” It stays here for 2 days.</p>
+      </div>
       <p class="count-pill" id="usageHome"></p>
     </div>
 
@@ -206,6 +229,8 @@
       <div class="btn-row"><button class="btn" onclick="shareImage()">Save image / Share</button></div>
       <p class="disclaimer">Generates an image to send by text or WhatsApp. It does not give access to this app.</p>
     </div>
+
+    <div class="app-foot">Homes Buy Olaf &amp; Paola · Private tool</div>
   </div>
 </div>
 <div id="toast" class="toast"></div>
