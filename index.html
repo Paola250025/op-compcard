@@ -120,8 +120,8 @@
   .rent-card .rent-big{font-family:var(--serif); font-size:26px; font-weight:500; color:var(--slate-deep); line-height:1.1}
   .rent-card .rent-edit{display:flex; align-items:baseline; gap:1px}
   .rent-card .rent-cur,.rent-card .rent-per{font-family:var(--serif); color:var(--slate-deep); font-size:19px}
-  .rent-card .rent-input{font-family:var(--serif); font-size:26px; font-weight:500; color:var(--slate-deep); border:none; border-bottom:1px dashed var(--slate); background:transparent; width:110px; padding:2px 0; -webkit-appearance:none; appearance:none}
-  .rent-card .rent-input:focus{outline:none; border-bottom:2px solid var(--slate)}
+  .rent-card .rent-input{font-family:var(--serif); font-size:23px; font-weight:500; color:var(--slate-deep); border:1px solid var(--slate); border-radius:10px; background:#fff; width:120px; padding:8px 12px; -webkit-appearance:none; appearance:none}
+  .rent-card .rent-input:focus{outline:2px solid var(--slate); outline-offset:1px}
   .rent-card .rent-range2{font-size:12px; color:var(--ink-soft); margin-top:3px}
   .rent-card .rent-tag{font-family:var(--sans); font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:600; color:#fff; background:var(--slate); padding:6px 13px; border-radius:100px; flex:none}
 
@@ -255,12 +255,12 @@
         <div class="rent-card">
           <div class="rent-edit">
             <span class="rent-cur">$</span>
-            <input id="rRent" class="rent-input" type="number" inputmode="numeric" oninput="rentEdited()">
+            <input id="rRent" class="rent-input" type="text" inputmode="numeric" oninput="rentEdited()">
             <span class="rent-per">/mo</span>
           </div>
           <div class="rent-tag">Rent</div>
         </div>
-        <p class="attr-note">Tap the rent to edit it if you know a better number.</p>
+        <p class="attr-note">Tap the box to type a different rent if you know a better number.</p>
       </div>
 
       <div class="section-label"><span class="eyebrow">Nearby comps</span></div>
@@ -494,8 +494,10 @@ function mapProperty(q, val, rent, prop){
   const hoa = (prop && prop.hoa && (prop.hoa.fee ?? prop.hoa)) || null;
   const sqft = (prop && prop.squareFootage) || null;
 
-  // Comp-based valuation (tighter than RentCast's AVM band)
-  const psfs = comps.map(c => (c.p && c.s) ? c.p/c.s : null).filter(x => x != null).sort((a,b)=>a-b);
+  // Comp-based valuation — prefer SOLD comps (closed sales) over active asking prices.
+  const psfSold = comps.filter(c=>c.status==='Sold').map(c => (c.p && c.s) ? c.p/c.s : null).filter(x => x != null).sort((a,b)=>a-b);
+  const psfAll  = comps.map(c => (c.p && c.s) ? c.p/c.s : null).filter(x => x != null).sort((a,b)=>a-b);
+  const psfs = psfSold.length >= 2 ? psfSold : psfAll;
   let est = val.price ?? null, lo = null, hi = null;
   if (sqft && psfs.length >= 2) {
     const mid = psfs.length % 2 ? psfs[(psfs.length-1)/2] : (psfs[psfs.length/2-1]+psfs[psfs.length/2])/2;
@@ -537,10 +539,8 @@ function renderResult(){
 
   // rent (its own section, separate from the sale valuation)
   const rentSection = document.getElementById('rentSection');
-  if(p.rent){
-    rentSection.classList.remove('hidden');
-    document.getElementById('rRent').value = Math.round(p.rent);
-  } else { rentSection.classList.add('hidden'); }
+  rentSection.classList.remove('hidden'); // always show, so a rent can be typed even if RentCast returns none
+  document.getElementById('rRent').value = (p.rent!=null) ? Math.round(p.rent) : "";
 
   // comps
   const subjPsf = (p.est&&p.sqft)? p.est/p.sqft : null;
