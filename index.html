@@ -494,10 +494,8 @@ function mapProperty(q, val, rent, prop){
   const hoa = (prop && prop.hoa && (prop.hoa.fee ?? prop.hoa)) || null;
   const sqft = (prop && prop.squareFootage) || null;
 
-  // Comp-based valuation — prefer SOLD comps (closed sales) over active asking prices.
-  const psfSold = comps.filter(c=>c.status==='Sold').map(c => (c.p && c.s) ? c.p/c.s : null).filter(x => x != null).sort((a,b)=>a-b);
-  const psfAll  = comps.map(c => (c.p && c.s) ? c.p/c.s : null).filter(x => x != null).sort((a,b)=>a-b);
-  const psfs = psfSold.length >= 2 ? psfSold : psfAll;
+  // Comp-based valuation — use the MIX of comps (sold, active, pending) for a closer-to-real price.
+  const psfs = comps.map(c => (c.p && c.s) ? c.p/c.s : null).filter(x => x != null).sort((a,b)=>a-b);
   let est = val.price ?? null, lo = null, hi = null;
   if (sqft && psfs.length >= 2) {
     const mid = psfs.length % 2 ? psfs[(psfs.length-1)/2] : (psfs[psfs.length/2-1]+psfs[psfs.length/2])/2;
