@@ -105,6 +105,13 @@
   .subject{background:linear-gradient(180deg,#fffdfb,var(--cream)); border:1px solid var(--line); border-radius:20px; padding:24px 22px; box-shadow:var(--shadow-lg)}
   .subject .addr{font-family:var(--serif); font-size:20px; font-weight:500; margin:0; line-height:1.25; letter-spacing:-.005em}
   .subject .facts{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px; color:var(--ink-soft); font-size:13px}
+  .attr-edit{display:flex; gap:8px; align-items:flex-end; margin-top:12px; flex-wrap:wrap}
+  .attr-edit .af{flex:1; min-width:60px}
+  .attr-edit .af label{display:block; font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--taupe); font-weight:600; margin-bottom:3px}
+  .attr-edit .af input{padding:9px 10px; font-size:14px; width:100%}
+  .attr-edit .attr-btn{flex:none; background:var(--slate); color:#fff; border:none; border-radius:10px; padding:11px 14px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; font-weight:600}
+  .attr-edit .attr-btn:hover{background:var(--slate-deep)}
+  .attr-note{font-size:11px; color:var(--ink-soft); font-style:italic; margin:6px 0 0}
   .range{margin-top:18px; padding-top:18px; border-top:1px solid var(--line); text-align:center}
   .range .eyebrow{display:block; margin-bottom:8px}
   .range .val{font-family:var(--serif); font-size:32px; font-weight:500; color:var(--ink); letter-spacing:-.015em; line-height:1.1}
@@ -219,7 +226,13 @@
       <button class="back" onclick="goHome()">&larr; Back</button>
       <div class="subject">
         <p class="addr" id="rAddr"></p>
-        <div class="facts" id="rFacts"></div>
+        <div class="attr-edit">
+          <div class="af"><label>Beds</label><input id="aBeds" type="number" inputmode="numeric"></div>
+          <div class="af"><label>Baths</label><input id="aBaths" type="number" inputmode="decimal" step="0.5"></div>
+          <div class="af"><label>Sqft</label><input id="aSqft" type="number" inputmode="numeric"></div>
+          <button class="attr-btn" onclick="recalcEstimate()">Update</button>
+        </div>
+        <p class="attr-note">RentCast fills these in automatically — edit them if they&rsquo;re wrong, then tap Update for a closer estimate.</p>
         <div class="range">
           <span class="eyebrow">Estimated price range</span>
           <div class="val" id="rRange"></div>
@@ -460,6 +473,8 @@ function mapProperty(q, val, rent, prop){
   }
 
   return {
+    query: q,
+    propertyType: (prop && prop.propertyType) || null,
     addr: (prop && prop.formattedAddress) || val.formattedAddress || q,
     beds: (prop && prop.bedrooms) ?? null,
     baths: (prop && prop.bathrooms) ?? null,
@@ -475,8 +490,9 @@ function mapProperty(q, val, rent, prop){
 function renderResult(){
   const p = current; showOnly('resultScreen');
   document.getElementById('rAddr').textContent = p.addr;
-  const facts=[]; if(p.beds!=null)facts.push(p.beds+" bd"); if(p.baths!=null)facts.push(p.baths+" ba"); if(p.sqft!=null)facts.push(p.sqft.toLocaleString()+" sqft");
-  document.getElementById('rFacts').innerHTML = facts.map(f=>"<span>"+f+"</span>").join('');
+  document.getElementById('aBeds').value = p.beds!=null ? p.beds : "";
+  document.getElementById('aBaths').value = p.baths!=null ? p.baths : "";
+  document.getElementById('aSqft').value = p.sqft!=null ? p.sqft : "";
   document.getElementById('rRange').textContent = (p.lo&&p.hi)? money(p.lo)+" – "+money(p.hi) : money(p.est);
   let estLine = (p.est&&p.sqft)? "Comp-based: "+money(p.est)+" · "+money(p.est/p.sqft)+"/sqft" : (p.est? "Comp-based: "+money(p.est):"");
   if(p.rentcastEst && p.rentcastEst!==p.est) estLine += " · RentCast AVM: "+money(p.rentcastEst);
@@ -505,6 +521,41 @@ function renderResult(){
   document.getElementById('cHoa').value = p.hoa!=null ? Math.round(p.hoa) : 0;
   document.getElementById('cIns').value = p.est ? Math.round(p.est*0.004) : "";
   calc();
+}
+
+async function recalcEstimate(){
+  if(!current || !getKey()) return;
+  const beds=num('aBeds'), baths=num('aBaths'), sqft=num('aSqft');
+  if(beds) current.beds=beds; if(baths) current.baths=baths; if(sqft) current.sqft=sqft;
+  const headers={"X-Api-Key":getKey()};
+  const base="address="+encodeURIComponent(current.query||current.addr)
+    +(current.beds?"&bedrooms="+current.beds:"")
+    +(current.baths?"&bathrooms="+current.baths:"")
+    +(current.sqft?"&squareFootage="+current.sqft:"")
+    +(current.propertyType?"&propertyType="+encodeURIComponent(current.propertyType):"");
+  toast("Updating estimate…");
+  try{
+    const [valRes,rentRes]=await Promise.all([
+      fetch(API_BASE+"/avm/value?"+base,{headers}),
+      fetch(API_BASE+"/avm/rent/long-term?"+base,{headers}).catch(()=>null)
+    ]);
+    bumpUsage();
+    if(valRes.ok){
+      const val=await valRes.json();
+      if(val.comparables){ current.comps=(val.comparables||[]).slice(0,4).map(c=>({a:c.formattedAddress||c.addressLine1||"Comp",p:c.price??c.lastSalePrice,s:c.squareFootage??c.squareFeet,hoa:(c.hoa&&(c.hoa.fee??c.hoa))??null})); }
+      const psfs=current.comps.map(c=>(c.p&&c.s)?c.p/c.s:null).filter(x=>x!=null).sort((a,b)=>a-b);
+      if(current.sqft && psfs.length>=2){
+        const mid=psfs.length%2?psfs[(psfs.length-1)/2]:(psfs[psfs.length/2-1]+psfs[psfs.length/2])/2;
+        current.est=Math.round(mid*current.sqft/1000)*1000;
+        current.lo=Math.round(psfs[0]*current.sqft/1000)*1000;
+        current.hi=Math.round(psfs[psfs.length-1]*current.sqft/1000)*1000;
+      } else { current.est=val.price??current.est; current.lo=val.priceRangeLow??current.lo; current.hi=val.priceRangeHigh??current.hi; }
+      current.rentcastEst=val.price??current.rentcastEst;
+    }
+    if(rentRes && rentRes.ok){ bumpUsage(); const rent=await rentRes.json(); if(rent.rent!=null){ current.rent=rent.rent; current.rentLo=rent.rentRangeLow; current.rentHi=rent.rentRangeHigh; } }
+    renderResult();
+    toast("Estimate updated");
+  }catch(e){ toast("Couldn't update. Try again."); }
 }
 
 function renderFlags(p){
