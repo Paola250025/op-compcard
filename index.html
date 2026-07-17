@@ -493,7 +493,7 @@ function renderResult(){
   document.getElementById('aBeds').value = p.beds!=null ? p.beds : "";
   document.getElementById('aBaths').value = p.baths!=null ? p.baths : "";
   document.getElementById('aSqft').value = p.sqft!=null ? p.sqft : "";
-  document.getElementById('rRange').textContent = (p.lo&&p.hi)? money(p.lo)+" – "+money(p.hi) : money(p.est);
+  document.getElementById('rRange').textContent = (p.lo&&p.hi)? money(p.lo)+" to "+money(p.hi) : money(p.est);
   let estLine = (p.est&&p.sqft)? "Comp-based: "+money(p.est)+" · "+money(p.est/p.sqft)+"/sqft" : (p.est? "Comp-based: "+money(p.est):"");
   if(p.rentcastEst && p.rentcastEst!==p.est) estLine += " · RentCast AVM: "+money(p.rentcastEst);
   document.getElementById('rEst').textContent = estLine;
@@ -689,9 +689,9 @@ function buildShareCanvas(){
   y+=54;
   ctx.font='600 18px system-ui,sans-serif'; ctx.fillStyle="#8a8178";
   ctx.fillText("E S T I M A T E D   P R I C E   R A N G E", cx, y); y+=64;
-  ctx.font='500 62px Georgia,serif'; ctx.fillStyle="#2b2926";
-  const rangeTxt = (p.lo&&p.hi)? money(p.lo)+" – "+money(p.hi) : money(p.est);
-  ctx.fillText(rangeTxt, cx, y); y+=44;
+  ctx.font='500 58px Georgia,serif'; ctx.fillStyle="#2b2926";
+  const rangeTxt = (p.lo&&p.hi)? money(p.lo)+" to "+money(p.hi) : money(p.est);
+  ctx.fillText(rangeTxt, cx, y); y+=64;
   if(p.est&&p.sqft){ ctx.font='400 20px system-ui,sans-serif'; ctx.fillStyle="#6f6a63"; ctx.fillText("Central "+money(p.est)+" · "+money(p.est/p.sqft)+"/sqft", cx, y); }
   y+=44;
   ctx.strokeStyle="#e7e1d8"; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke();
