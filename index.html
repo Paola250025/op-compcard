@@ -232,7 +232,6 @@
         <div class="rent-card">
           <div>
             <div class="rent-big" id="rRent"></div>
-            <div class="rent-range2" id="rRentSub"></div>
           </div>
           <div class="rent-tag">Rent</div>
         </div>
@@ -488,7 +487,6 @@ function renderResult(){
   if(p.rent){
     rentSection.classList.remove('hidden');
     document.getElementById('rRent').textContent = money(p.rent)+"/mo";
-    document.getElementById('rRentSub').textContent = (p.rentLo&&p.rentHi)? "Range "+money(p.rentLo)+" to "+money(p.rentHi)+"/mo" : "Estimated monthly rent";
   } else { rentSection.classList.add('hidden'); }
 
   // comps
