@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O&P CompCard</title>
+<meta name="description" content="Private comps and cost tool for Homes Buy Olaf & Paola.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#5f7a87">
+<style>
+  :root{
+    --bg:#ffffff; --cream:#faf8f4; --panel:#ffffff;
+    --ink:#2b2926; --ink-soft:#6f6a63; --line:#e7e1d8;
+    --taupe:#8a8178; --slate:#5f7a87; --slate-deep:#4c6570; --wm-gray:#9aa1a5;
+    --good:#3f7d55; --good-bg:#eaf3ec; --bad:#b1543a; --bad-bg:#f6ece7;
+    --gold:#a98d5d;
+    --shadow:0 4px 18px rgba(43,41,38,.08);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--cream); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.5;
+    -webkit-text-size-adjust:100%; overflow-x:hidden;}
+  .app{max-width:520px; margin:0 auto; min-height:100vh; background:var(--bg); box-shadow:0 0 40px rgba(43,41,38,.06);}
+  button{font-family:var(--sans); cursor:pointer}
+  .hidden{display:none !important}
+
+  .brand{background:var(--bg); border-bottom:1px solid var(--line); text-align:center; padding:18px 16px 14px;}
+  .brand h1{font-family:var(--sans); font-weight:800; font-size:20px; letter-spacing:.06em; margin:0; color:var(--wm-gray)}
+  .brand h1 .buy{color:var(--slate)}
+  .brand h1 .amp{color:var(--slate); font-weight:600}
+  .brand .sub{font-family:var(--sans); font-size:10px; color:var(--taupe); margin-top:4px; letter-spacing:.28em; text-transform:uppercase; font-weight:600}
+  .brand .gear{position:absolute; right:16px; top:16px; background:none; border:none; color:var(--taupe); font-size:20px}
+  .brand-wrap{position:relative}
+
+  .screen{padding:20px 18px 40px}
+  .eyebrow{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--taupe); font-weight:600}
+
+  .lock{min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:40px 24px; text-align:center}
+  .lock h2{font-family:var(--sans); font-weight:800; letter-spacing:.06em; font-size:18px; margin:0; color:var(--wm-gray)}
+  .lock h2 .buy{color:var(--slate)} .lock h2 .amp{color:var(--slate)}
+  .lock p{color:var(--ink-soft); font-size:14px; margin:0}
+  input,.field{font-family:var(--sans); font-size:16px}
+  input[type=text],input[type=password],input[type=number]{
+    width:100%; padding:13px 14px; border:1px solid var(--line); border-radius:12px; background:var(--cream); color:var(--ink);}
+  input:focus{outline:2px solid var(--slate); outline-offset:1px; background:#fff}
+
+  .btn{background:var(--slate); color:#fff; border:none; border-radius:12px; padding:13px 18px; font-size:14px;
+    letter-spacing:.06em; text-transform:uppercase; font-weight:600; width:100%;}
+  .btn:hover{background:var(--slate-deep)}
+  .btn.ghost{background:transparent; color:var(--slate); border:1px solid var(--line)}
+  .btn.gold{background:var(--gold)}
+  .btn-row{display:flex; gap:10px; margin-top:14px}
+  .btn-row .btn{width:auto; flex:1}
+
+  .search-wrap{display:flex; gap:8px; margin-top:8px}
+  .search-wrap input{flex:1}
+  .search-wrap button{flex:none; width:auto; padding:13px 18px}
+
+  .section-label{margin:26px 0 10px; display:flex; align-items:center; gap:10px}
+  .section-label::after{content:""; flex:1; height:1px; background:var(--line)}
+
+  .recent{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
+  .recent li{border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px; background:var(--panel)}
+  .recent .addr{font-weight:500; font-size:14px}
+  .recent .meta{font-size:12px; color:var(--ink-soft)}
+  .recent .open{font-size:12px; color:var(--slate); border:none; background:none; text-transform:uppercase; letter-spacing:.08em; font-weight:600}
+  .empty-note{color:var(--ink-soft); font-size:13px; font-style:italic}
+  .err{color:var(--bad); font-size:14px; margin-top:10px}
+
+  .subject{background:var(--cream); border:1px solid var(--line); border-radius:16px; padding:18px; box-shadow:var(--shadow)}
+  .subject .addr{font-family:var(--serif); font-size:18px; font-weight:600; margin:0}
+  .subject .facts{display:flex; gap:14px; flex-wrap:wrap; margin-top:6px; color:var(--ink-soft); font-size:13px}
+  .range{margin-top:14px; padding-top:14px; border-top:1px solid var(--line); text-align:center}
+  .range .eyebrow{display:block; margin-bottom:4px}
+  .range .val{font-family:var(--serif); font-size:26px; font-weight:600; color:var(--ink)}
+  .range .est{font-size:12px; color:var(--ink-soft); margin-top:2px}
+
+  .comps{width:100%; border-collapse:collapse; margin-top:8px; font-size:13px}
+  .comps th,.comps td{text-align:right; padding:9px 8px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums}
+  .comps th:first-child,.comps td:first-child{text-align:left}
+  .comps th{font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--taupe); font-weight:600}
+  .comps tr.subj td{background:var(--cream); font-weight:600}
+  .comps .sub-note{font-size:11px; color:var(--ink-soft)}
+
+  .flags{display:flex; flex-direction:column; gap:8px; margin-top:8px}
+  .flag{display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:12px; padding:10px 12px}
+  .flag .name{font-size:13px; font-weight:600; flex:none; width:130px}
+  .flag .body{flex:1; font-size:13px; color:var(--ink-soft); display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .flag input{padding:7px 10px; border-radius:8px; font-size:13px; max-width:150px}
+  .chip{font-size:11px; letter-spacing:.04em; text-transform:uppercase; font-weight:600; padding:3px 9px; border-radius:100px}
+  .chip.good{background:var(--good-bg); color:var(--good)}
+  .chip.bad{background:var(--bad-bg); color:var(--bad)}
+  .chip.neutral{background:#eee; color:var(--ink-soft)}
+
+  .calc{background:var(--cream); border:1px solid var(--line); border-radius:16px; padding:16px; margin-top:8px}
+  .calc-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px}
+  .calc-grid label{font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--taupe); font-weight:600; display:block; margin-bottom:4px}
+  .calc-out{border-top:1px solid var(--line); padding-top:12px}
+  .calc-line{display:flex; justify-content:space-between; font-size:13px; padding:3px 0; color:var(--ink-soft); font-variant-numeric:tabular-nums}
+  .calc-line.total{font-size:17px; color:var(--ink); font-weight:700; font-family:var(--serif); margin-top:6px; padding-top:8px; border-top:1px solid var(--line)}
+
+  .disclaimer{font-size:11.5px; color:var(--ink-soft); font-style:italic; text-align:center; margin-top:16px; line-height:1.5}
+  .loading{text-align:center; color:var(--ink-soft); padding:30px; font-style:italic}
+
+  .share-card{background:#fff; border:1px solid var(--line); border-radius:16px; padding:22px; box-shadow:var(--shadow)}
+  .share-card .sc-brand{font-family:var(--sans); letter-spacing:.06em; font-weight:800; text-align:center; font-size:16px; color:var(--wm-gray)}
+  .share-card .sc-sub{font-family:var(--sans); font-size:9px; letter-spacing:.28em; text-transform:uppercase; font-weight:600; color:var(--taupe); text-align:center; margin-bottom:14px}
+  .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--ink); color:#fff; padding:11px 18px; border-radius:100px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:50}
+  .toast.show{opacity:1}
+  .back{background:none; border:none; color:var(--slate); font-size:13px; letter-spacing:.06em; text-transform:uppercase; font-weight:600; padding:0; margin-bottom:14px}
+  .count-pill{font-size:11px; color:var(--ink-soft); text-align:right; margin-top:10px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- LOCK -->
+  <div id="lockScreen" class="lock">
+    <h2>HOMES<span class="buy">BUY</span> OLAF <span class="amp">&amp;</span> PAOLA</h2>
+    <p>O&amp;P CompCard — private tool.</p>
+    <div style="width:100%; max-width:280px">
+      <input type="password" id="pwInput" placeholder="Password" autocomplete="off" onkeydown="if(event.key==='Enter')unlock()">
+      <button class="btn" style="margin-top:10px" onclick="unlock()">Enter</button>
+      <p id="pwErr" class="err hidden">Wrong password</p>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="mainApp" class="hidden">
+    <div class="brand brand-wrap">
+      <button class="gear" onclick="openSettings()" title="Settings">⚙</button>
+      <h1>HOMES<span class="buy">BUY</span> OLAF <span class="amp">&amp;</span> PAOLA</h1>
+      <div class="sub">Make the right move</div>
+    </div>
+
+    <!-- SETTINGS / API KEY -->
+    <div id="settingsScreen" class="screen hidden">
+      <button class="back" onclick="goHome()">← Back</button>
+      <span class="eyebrow">RentCast API key</span>
+      <p class="empty-note" style="margin:8px 0">Stored only on this device, never uploaded. Get it free at rentcast.io (Developer plan).</p>
+      <input type="text" id="keyInput" placeholder="Paste your RentCast API key">
+      <div class="btn-row"><button class="btn" onclick="saveKey()">Save key</button></div>
+      <p class="count-pill" id="usageNote"></p>
+    </div>
+
+    <!-- HOME -->
+    <div id="homeScreen" class="screen">
+      <span class="eyebrow">Search a property</span>
+      <div class="search-wrap">
+        <input type="text" id="addrInput" placeholder="Address, City, ST" onkeydown="if(event.key==='Enter')searchAddr()">
+        <button class="btn" onclick="searchAddr()">Search</button>
+      </div>
+      <p id="homeErr" class="err hidden"></p>
+
+      <div class="section-label"><span class="eyebrow">Recent homes</span></div>
+      <ul id="recentList" class="recent"></ul>
+      <p id="recentEmpty" class="empty-note">No saved homes yet. They're kept at least 2 days.</p>
+      <p class="count-pill" id="usageHome"></p>
+    </div>
+
+    <!-- LOADING -->
+    <div id="loadingScreen" class="screen hidden"><div class="loading">Looking up property…</div></div>
+
+    <!-- RESULT -->
+    <div id="resultScreen" class="screen hidden">
+      <button class="back" onclick="goHome()">← Back</button>
+      <div class="subject">
+        <p class="addr" id="rAddr"></p>
+        <div class="facts" id="rFacts"></div>
+        <div class="range">
+          <span class="eyebrow">Estimated price range</span>
+          <div class="val" id="rRange"></div>
+          <div class="est" id="rEst"></div>
+        </div>
+      </div>
+
+      <div class="section-label"><span class="eyebrow">Nearby comps</span></div>
+      <table class="comps"><thead><tr><th>Home</th><th>Price</th><th>Sqft</th><th>$/sqft</th></tr></thead><tbody id="rComps"></tbody></table>
+
+      <div class="section-label"><span class="eyebrow">Costs &amp; flags</span></div>
+      <div class="flags" id="rFlags"></div>
+
+      <div class="section-label"><span class="eyebrow">Payment calculator</span></div>
+      <div class="calc">
+        <div class="calc-grid">
+          <div><label>Down payment $</label><input type="number" id="cDown" oninput="calc()" placeholder="80000"></div>
+          <div><label>Rate %</label><input type="number" id="cRate" oninput="calc()" step="0.01" value="6.75"></div>
+        </div>
+        <div class="calc-out" id="cOut"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn ghost" onclick="saveHouse()">Save home</button>
+        <button class="btn gold" onclick="openShare()">Share</button>
+      </div>
+      <p class="disclaimer">Prices, comps and payments are <b>approximate</b> and for reference only. Not an appraisal or an offer.</p>
+    </div>
+
+    <!-- SHARE -->
+    <div id="shareScreen" class="screen hidden">
+      <button class="back" onclick="backToResult()">← Back</button>
+      <span class="eyebrow">Share preview</span>
+      <div class="share-card" id="shareCard" style="margin-top:10px"></div>
+      <div class="btn-row"><button class="btn" onclick="shareImage()">Save image / Share</button></div>
+      <p class="disclaimer">Generates an image to send by text or WhatsApp. It does not give access to this app.</p>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+// ===== Config =====
+const PW_HASH = "0949159dbea6befda0932a6f43fd3d53a360b8a9046731b089af4d3b64370ad3"; // sha256 of the shared password
+const API_BASE = "https://api.rentcast.io/v1";
+const money = n => (n==null||isNaN(n)) ? "—" : "$"+Math.round(n).toLocaleString("en-US");
+let current = null;
+
+// ===== Lock (password by hash) =====
+async function sha256(s){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+async function unlock(){
+  const h = await sha256(document.getElementById('pwInput').value.trim());
+  if(h===PW_HASH){ localStorage.setItem('opcc_unlocked','1'); showApp(); }
+  else document.getElementById('pwErr').classList.remove('hidden');
+}
+function showApp(){
+  document.getElementById('lockScreen').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  if(!getKey()) openSettings(); else goHome();
+  renderRecent(); updateUsage();
+}
+if(localStorage.getItem('opcc_unlocked')==='1'){ window.addEventListener('DOMContentLoaded', showApp); }
+
+// ===== API key (per device) =====
+function getKey(){ return localStorage.getItem('opcc_apikey')||""; }
+function saveKey(){
+  const k = document.getElementById('keyInput').value.trim();
+  if(!k){ toast("Paste a key first"); return; }
+  localStorage.setItem('opcc_apikey', k); toast("Key saved on this device"); goHome();
+}
+function openSettings(){
+  showOnly('settingsScreen');
+  document.getElementById('keyInput').value = getKey();
+  updateUsage();
+}
+
+// ===== Usage counter (local estimate) =====
+function monthKey(){ const d=new Date(); return 'opcc_calls_'+d.getFullYear()+'_'+(d.getMonth()+1); }
+function bumpUsage(){ const k=monthKey(); const n=(parseInt(localStorage.getItem(k))||0)+1; localStorage.setItem(k,n); updateUsage(); }
+function updateUsage(){
+  const n = parseInt(localStorage.getItem(monthKey()))||0;
+  const txt = `~${n}/50 free lookups used this month (this device)`;
+  const a=document.getElementById('usageNote'), b=document.getElementById('usageHome');
+  if(a) a.textContent = txt; if(b) b.textContent = txt;
+}
+
+// ===== Screens =====
+function showOnly(id){
+  ['homeScreen','resultScreen','shareScreen','settingsScreen','loadingScreen'].forEach(s=>{
+    document.getElementById(s).classList.toggle('hidden', s!==id);
+  });
+}
+function goHome(){ showOnly('homeScreen'); renderRecent(); }
+
+// ===== Search (real RentCast) =====
+async function searchAddr(){
+  const q = document.getElementById('addrInput').value.trim();
+  const errEl = document.getElementById('homeErr'); errEl.classList.add('hidden');
+  if(!q) return;
+  if(!getKey()){ openSettings(); toast("Add your API key first"); return; }
+  showOnly('loadingScreen');
+  try{
+    const headers = { "X-Api-Key": getKey() };
+    const enc = encodeURIComponent(q);
+    const [valRes, propRes] = await Promise.all([
+      fetch(`${API_BASE}/avm/value?address=${enc}`, {headers}),
+      fetch(`${API_BASE}/properties?address=${enc}`, {headers}).catch(()=>null)
+    ]);
+    bumpUsage();
+    if(valRes.status===401 || valRes.status===403) throw new Error("Invalid API key. Check it in Settings (⚙).");
+    if(valRes.status===429) throw new Error("Monthly free limit reached. You can still type numbers into the calculator.");
+    if(!valRes.ok) throw new Error("No data found for this address. Check the format: Address, City, ST.");
+    const val = await valRes.json();
+    let prop = null;
+    if(propRes && propRes.ok){ const arr = await propRes.json(); prop = Array.isArray(arr)? arr[0] : arr; }
+    current = mapProperty(q, val, prop);
+    renderResult();
+  }catch(e){
+    showOnly('homeScreen');
+    errEl.textContent = e.message || "Something went wrong. Try again.";
+    errEl.classList.remove('hidden');
+  }
+}
+
+// Map RentCast responses into our shape, defensively.
+function mapProperty(q, val, prop){
+  const comps = (val.comparables||[]).slice(0,4).map(c=>({
+    a: c.formattedAddress || c.addressLine1 || "Comp",
+    p: c.price ?? c.lastSalePrice, s: c.squareFootage ?? c.squareFeet,
+    hoa: (c.hoa && (c.hoa.fee ?? c.hoa)) ?? null
+  }));
+  const taxObj = prop && (prop.propertyTaxes || prop.taxAssessments);
+  let tax = null;
+  if(taxObj){ const yrs = Object.keys(taxObj).sort(); const last = taxObj[yrs[yrs.length-1]]; tax = last && (last.total ?? last.amount ?? last.value); }
+  const hoa = prop && prop.hoa && (prop.hoa.fee ?? prop.hoa) || null;
+  return {
+    addr: (prop && prop.formattedAddress) || val.formattedAddress || q,
+    beds: (prop && (prop.bedrooms)) ?? null,
+    baths: (prop && (prop.bathrooms)) ?? null,
+    sqft: (prop && (prop.squareFootage)) ?? null,
+    est: val.price ?? null,
+    lo: val.priceRangeLow ?? (val.price? Math.round(val.price*0.97):null),
+    hi: val.priceRangeHigh ?? (val.price? Math.round(val.price*1.03):null),
+    comps, hoa, tax, assessment:null, warrantable:null
+  };
+}
+
+function renderResult(){
+  const p = current; showOnly('resultScreen');
+  document.getElementById('rAddr').textContent = p.addr;
+  const facts=[]; if(p.beds!=null)facts.push(p.beds+" bd"); if(p.baths!=null)facts.push(p.baths+" ba"); if(p.sqft!=null)facts.push(p.sqft.toLocaleString()+" sqft");
+  document.getElementById('rFacts').innerHTML = facts.map(f=>`<span>${f}</span>`).join('');
+  document.getElementById('rRange').textContent = (p.lo&&p.hi)? money(p.lo)+" – "+money(p.hi) : money(p.est);
+  document.getElementById('rEst').textContent = (p.est&&p.sqft)? "Central estimate: "+money(p.est)+" · "+money(p.est/p.sqft)+"/sqft" : (p.est? "Central estimate: "+money(p.est):"");
+  const subjPsf = (p.est&&p.sqft)? p.est/p.sqft : null;
+  let rows = `<tr class="subj"><td>This home<div class="sub-note">subject</div></td><td>${money(p.est)}</td><td>${p.sqft? p.sqft.toLocaleString():"—"}</td><td>${money(subjPsf)}</td></tr>`;
+  if(p.comps.length===0) rows += `<tr><td colspan="4" class="sub-note">No comps returned for this address.</td></tr>`;
+  p.comps.forEach(c=>{ rows += `<tr><td>${c.a}</td><td>${money(c.p)}</td><td>${c.s? c.s.toLocaleString():"—"}</td><td>${money(c.p&&c.s? c.p/c.s:null)}</td></tr>`; });
+  document.getElementById('rComps').innerHTML = rows;
+  renderFlags(p);
+  document.getElementById('cDown').value=""; calc();
+}
+
+function renderFlags(p){
+  const compHoas = p.comps.map(c=>c.hoa).filter(x=>x!=null);
+  const avgHoa = compHoas.length ? compHoas.reduce((a,b)=>a+b,0)/compHoas.length : null;
+  let hoaChip="";
+  if(p.hoa!=null && avgHoa!=null){ hoaChip = p.hoa>avgHoa*1.15 ? `<span class="chip bad">Higher than comps (~${money(avgHoa)})</span>` : `<span class="chip good">In line with comps</span>`; }
+  const F=[
+    {n:"HOA", val:p.hoa, suf:"/mo", chip:hoaChip, kind:"num"},
+    {n:"Taxes", val:p.tax, suf:"/yr", chip:"", kind:"num"},
+    {n:"Assessment", val:p.assessment, suf:"", chip:"", kind:"num"},
+    {n:"Non-warrantable", val:null, suf:"", chip:"", kind:"text"},
+  ];
+  let html="";
+  F.forEach(f=>{
+    let body;
+    if(f.val!=null){ body = `<b style="color:var(--ink)">${money(f.val)}${f.suf}</b> ${f.chip}`; }
+    else { body = `<span class="chip neutral">No data</span> <input type="${f.kind==='num'?'number':'text'}" placeholder="type ${f.n}">`; }
+    html += `<div class="flag"><div class="name">${f.n}</div><div class="body">${body}</div></div>`;
+  });
+  document.getElementById('rFlags').innerHTML = html;
+}
+
+function calc(){
+  const p=current; if(!p) return;
+  const price = p.est||0;
+  const down = parseFloat(document.getElementById('cDown').value)||0;
+  const rate = (parseFloat(document.getElementById('cRate').value)||6.75)/100/12;
+  const loan = Math.max(price-down,0), n=360;
+  const pi = rate>0 ? loan*rate/(1-Math.pow(1+rate,-n)) : loan/n;
+  const tax = (p.tax? p.tax : price*0.0115)/12;
+  const hoa = p.hoa||0, ins = price*0.004/12;
+  const total = pi+tax+hoa+ins; current._payment = total;
+  document.getElementById('cOut').innerHTML =
+    `<div class="calc-line"><span>Loan (${money(loan)})</span><span>${money(pi)}</span></div>`+
+    `<div class="calc-line"><span>Taxes</span><span>${money(tax)}</span></div>`+
+    `<div class="calc-line"><span>HOA</span><span>${money(hoa)}</span></div>`+
+    `<div class="calc-line"><span>Insurance</span><span>${money(ins)}</span></div>`+
+    `<div class="calc-line total"><span>Est. monthly payment</span><span>${money(total)}</span></div>`;
+}
+
+// ===== Save homes (localStorage, 2-day expiry) =====
+function saveHouse(){
+  const list=getRecent();
+  const rec={data:current, ts:Date.now(), key:current.addr};
+  const filtered=list.filter(x=>x.key!==rec.key); filtered.unshift(rec);
+  localStorage.setItem('opcc_recent', JSON.stringify(filtered.slice(0,20)));
+  toast("Home saved (2 days)");
+}
+function getRecent(){
+  let list=[]; try{ list=JSON.parse(localStorage.getItem('opcc_recent')||'[]'); }catch(e){}
+  const cutoff=Date.now()-2*24*60*60*1000; list=list.filter(x=>x.ts>cutoff);
+  localStorage.setItem('opcc_recent', JSON.stringify(list)); return list;
+}
+function renderRecent(){
+  const list=getRecent(); const ul=document.getElementById('recentList');
+  document.getElementById('recentEmpty').style.display=list.length?'none':'block';
+  ul.innerHTML=list.map((x,i)=>{
+    const ageH=Math.floor((Date.now()-x.ts)/3600000);
+    const age=ageH<1?"just now":(ageH<24?`${ageH} h ago`:`${Math.floor(ageH/24)} d ago`);
+    return `<li><div><div class="addr">${x.data.addr}</div><div class="meta">${money(x.data.est)} · ${age}</div></div><button class="open" onclick="reopen(${i})">Open</button></li>`;
+  }).join('');
+}
+function reopen(i){ const list=getRecent(); if(list[i]){ current=list[i].data; renderResult(); } }
+
+// ===== Share =====
+function openShare(){
+  const p=current; showOnly('shareScreen');
+  document.getElementById('shareCard').innerHTML =
+    `<div class="sc-brand">HOMES<span style="color:var(--slate)">BUY</span> OLAF <span style="color:var(--slate)">&amp;</span> PAOLA</div><div class="sc-sub">Make the right move</div>`+
+    `<p style="font-family:var(--serif); font-size:16px; font-weight:600; text-align:center; margin:0 0 4px">${p.addr}</p>`+
+    `<p style="text-align:center; color:var(--ink-soft); font-size:13px; margin:0 0 14px">${[p.beds!=null?p.beds+' bd':'',p.baths!=null?p.baths+' ba':'',p.sqft?p.sqft.toLocaleString()+' sqft':''].filter(Boolean).join(' · ')}</p>`+
+    `<div style="text-align:center; padding:12px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line)"><div class="eyebrow">Estimated range</div><div style="font-family:var(--serif); font-size:24px; font-weight:600">${(p.lo&&p.hi)?money(p.lo)+" – "+money(p.hi):money(p.est)}</div></div>`+
+    `<div style="display:flex; justify-content:space-between; font-size:13px; margin-top:12px"><span>HOA</span><b>${p.hoa!=null?money(p.hoa)+"/mo":"—"}</b></div>`+
+    `<div style="display:flex; justify-content:space-between; font-size:13px; margin-top:6px"><span>Taxes</span><b>${p.tax!=null?money(p.tax)+"/yr":"—"}</b></div>`+
+    (current._payment?`<div style="display:flex; justify-content:space-between; font-size:13px; margin-top:6px"><span>Est. monthly payment</span><b>${money(current._payment)}</b></div>`:"")+
+    `<p style="font-size:10.5px; color:var(--ink-soft); font-style:italic; text-align:center; margin-top:14px">Approximate figures, for reference only. Not an appraisal or an offer.</p>`;
+}
+function backToResult(){ showOnly('resultScreen'); }
+async function shareImage(){
+  // Uses the Web Share API with the rendered card as text fallback; image capture can be added later.
+  const p=current;
+  const text = `${p.addr}\nEstimated: ${(p.lo&&p.hi)?money(p.lo)+" – "+money(p.hi):money(p.est)}\nHOA: ${p.hoa!=null?money(p.hoa)+"/mo":"—"} · Taxes: ${p.tax!=null?money(p.tax)+"/yr":"—"}${current._payment?"\nEst. payment: "+money(current._payment):""}\n(Approximate — Homes Buy Olaf & Paola)`;
+  if(navigator.share){ try{ await navigator.share({title:"Homes Buy Olaf & Paola", text}); return; }catch(e){} }
+  try{ await navigator.clipboard.writeText(text); toast("Copied — paste into your message"); }
+  catch(e){ toast("Select and copy the card"); }
+}
+
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+</script>
+</body>
+</html>
