@@ -253,14 +253,11 @@
       <div id="rentSection">
         <div class="section-label"><span class="eyebrow">Rental estimate · for investors</span></div>
         <div class="rent-card">
-          <div class="rent-edit">
-            <span class="rent-cur">$</span>
-            <input id="rRent" class="rent-input" type="text" inputmode="numeric" oninput="rentEdited()">
-            <span class="rent-per">/mo</span>
+          <div>
+            <div class="rent-big" id="rRent"></div>
           </div>
           <div class="rent-tag">Rent</div>
         </div>
-        <p class="attr-note">Tap the box to type a different rent if you know a better number.</p>
       </div>
 
       <div class="section-label"><span class="eyebrow">Nearby comps</span></div>
@@ -537,8 +534,10 @@ function renderResult(){
 
   // rent (its own section, separate from the sale valuation)
   const rentSection = document.getElementById('rentSection');
-  rentSection.classList.remove('hidden'); // always show, so a rent can be typed even if RentCast returns none
-  document.getElementById('rRent').value = (p.rent!=null) ? Math.round(p.rent) : "";
+  if(p.rent!=null){
+    rentSection.classList.remove('hidden');
+    document.getElementById('rRent').textContent = money(p.rent)+"/mo";
+  } else { rentSection.classList.add('hidden'); }
 
   // comps
   const subjPsf = (p.est&&p.sqft)? p.est/p.sqft : null;
