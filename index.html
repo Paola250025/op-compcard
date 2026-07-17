@@ -40,7 +40,7 @@
   .chess{font-family:"Segoe UI Symbol","Apple Symbols","Noto Sans Symbols2",var(--sans); color:var(--slate); letter-spacing:.06em; line-height:1}
 
   .brand{background:var(--bg); border-bottom:1px solid var(--line); text-align:center; padding:16px 16px 13px; position:relative}
-  .brand .chess{font-size:20px; display:block; margin-bottom:4px}
+  .brand .chess{font-size:21px; display:block; margin-bottom:4px; letter-spacing:-.05em}
   .brand h1{font-family:var(--sans); font-weight:800; font-size:19px; letter-spacing:.06em; margin:0; color:var(--wm-gray)}
   .brand h1 .buy{color:var(--slate)} .brand h1 .amp{color:var(--slate)}
   .brand .sub{font-family:var(--sans); font-size:9.5px; color:var(--taupe); margin-top:4px; letter-spacing:.28em; text-transform:uppercase; font-weight:600}
@@ -169,7 +169,7 @@
   <div id="mainApp" class="hidden">
     <div class="brand">
       <button class="gear" onclick="openSettings()" title="Settings">&#9881;</button>
-      <span class="chess">&#9820;&nbsp;&#9819;&nbsp;&#9822;</span>
+      <span class="chess">&#9820;&#9819;&#9822;</span>
       <h1>HOMES<span class="buy">BUY</span> OLAF <span class="amp">&amp;</span> PAOLA</h1>
       <div class="sub">Make the right move</div>
     </div>
@@ -590,7 +590,7 @@ function buildShareCanvas(){
   // chess motif
   ctx.textAlign="center"; ctx.fillStyle="#5f7a87";
   ctx.font='46px "Apple Symbols","Segoe UI Symbol",serif';
-  ctx.fillText("♜  ♛  ♞", cx, 92);
+  ctx.fillText("♜♛♞", cx, 92);
   // wordmark
   ctx.font='800 34px system-ui,-apple-system,Segoe UI,sans-serif';
   ctx.fillStyle="#9aa1a5";
