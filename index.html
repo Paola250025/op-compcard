@@ -320,13 +320,13 @@ let lastShareBlob = null;
 
 // Normalize a comp's listing status to Sold / Active / Pending
 function compStatus(c){
-  const raw = ((c.status||c.mlsStatus||c.standardStatus||c.listingType||"")+"").toLowerCase();
+  const raw = ((c.status||c.mlsStatus||c.standardStatus||"")+"").toLowerCase();
   if(raw.indexOf("pend")>=0 || raw.indexOf("contract")>=0) return "Pending";
+  // A listing that has been removed from the market is a completed (Sold) comp,
+  // even if a stale status field still says "Active".
+  if(c.removedDate || raw.indexOf("sold")>=0 || raw.indexOf("closed")>=0 || raw.indexOf("inactive")>=0) return "Sold";
   if(raw.indexOf("active")>=0) return "Active";
-  if(raw.indexOf("sold")>=0 || raw.indexOf("closed")>=0 || raw.indexOf("inactive")>=0) return "Sold";
-  if(c.removedDate || c.lastSalePrice) return "Sold";
-  if(c.status) return c.status;
-  return "Sold";
+  return "Active"; // still listed, not removed
 }
 function statusChip(s){ if(!s) return ''; return '<div class="comp-status '+String(s).toLowerCase()+'">'+s+'</div>'; }
 
