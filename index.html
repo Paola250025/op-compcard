@@ -135,6 +135,8 @@
   .comp-status.sold{background:#ecebe8; color:#6f6a63}
   .comp-status.active{background:var(--good-bg); color:var(--good)}
   .comp-status.pending{background:#fbf1e0; color:#a9773a}
+  .market-summary{font-size:14px; color:var(--ink); margin:2px 0 10px; font-weight:500}
+  .market-summary b{color:var(--slate-deep)}
 
   .flags{display:flex; flex-direction:column; gap:8px; margin-top:8px}
   .flag{display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:12px; padding:10px 12px}
@@ -263,6 +265,12 @@
 
       <div class="section-label"><span class="eyebrow">Nearby comps</span></div>
       <table class="comps"><thead><tr><th>Home</th><th>Price</th><th>Sqft</th><th>$/sqft</th></tr></thead><tbody id="rComps"></tbody></table>
+
+      <div class="section-label"><span class="eyebrow">Competition · active &amp; pending nearby</span></div>
+      <div id="marketBox">
+        <button class="btn ghost" onclick="loadMarket()">See active &amp; pending within 1 mile</button>
+        <p class="attr-note">Uses 1 lookup. Shows what&rsquo;s competing on the market right now.</p>
+      </div>
 
       <div class="section-label"><span class="eyebrow">Costs &amp; flags</span></div>
       <div class="flags" id="rFlags"></div>
@@ -502,6 +510,8 @@ function mapProperty(q, val, rent, prop){
   return {
     query: q,
     propertyType: (prop && prop.propertyType) || null,
+    lat: val.latitude ?? (prop && prop.latitude) ?? null,
+    lng: val.longitude ?? (prop && prop.longitude) ?? null,
     addr: (prop && prop.formattedAddress) || val.formattedAddress || q,
     beds: (prop && prop.bedrooms) ?? null,
     baths: (prop && prop.bathrooms) ?? null,
@@ -540,6 +550,9 @@ function renderResult(){
   document.getElementById('rComps').innerHTML = rows;
 
   renderFlags(p);
+
+  // reset the competition box for this property
+  document.getElementById('marketBox').innerHTML = '<button class="btn ghost" onclick="loadMarket()">See active &amp; pending within 1 mile</button><p class="attr-note">Uses 1 lookup. Shows what’s competing on the market right now.</p>';
 
   // calculator prefill (editable)
   document.getElementById('cPrice').value = p.est!=null ? Math.round(p.est) : "";
@@ -583,6 +596,30 @@ async function recalcEstimate(){
     renderResult();
     toast("Estimate updated");
   }catch(e){ toast("Couldn't update. Try again."); }
+}
+
+async function loadMarket(){
+  if(!current || !getKey()) return;
+  const box=document.getElementById('marketBox');
+  const lat=current.lat, lng=current.lng;
+  if(lat==null||lng==null){ box.innerHTML='<p class="empty-note">No location available for this address, so nearby listings can’t be pulled.</p>'; return; }
+  box.innerHTML='<p class="empty-note">Loading nearby listings…</p>';
+  try{
+    const headers={"X-Api-Key":getKey()};
+    const res=await fetch(API_BASE+"/listings/sale?latitude="+lat+"&longitude="+lng+"&radius=1&limit=50",{headers});
+    bumpUsage();
+    if(!res.ok) throw new Error();
+    const arr=await res.json(); const list=Array.isArray(arr)?arr:[];
+    const items=list.map(l=>({a:l.formattedAddress||l.addressLine1||"Listing", p:l.price??l.listPrice, s:l.squareFootage, dom:l.daysOnMarket, st:compStatus(l)})).filter(i=>i.st==='Active'||i.st==='Pending');
+    if(!items.length){ box.innerHTML='<p class="empty-note">No active or pending listings within 1 mile right now.</p>'; return; }
+    const active=items.filter(i=>i.st==='Active').length;
+    const pending=items.filter(i=>i.st==='Pending').length;
+    let html='<p class="market-summary"><b>'+active+'</b> active &nbsp;·&nbsp; <b>'+pending+'</b> pending within 1 mile</p>';
+    html+='<table class="comps"><thead><tr><th>Home</th><th>Price</th><th>Sqft</th><th>DOM</th></tr></thead><tbody>';
+    items.slice(0,15).forEach(i=>{ html+='<tr><td>'+i.a+statusChip(i.st)+'</td><td>'+money(i.p)+'</td><td>'+(i.s?i.s.toLocaleString():"—")+'</td><td>'+(i.dom!=null?i.dom+"d":"—")+'</td></tr>'; });
+    html+='</tbody></table>';
+    box.innerHTML=html;
+  }catch(e){ box.innerHTML='<p class="err">Couldn’t load nearby listings. Try again.</p><button class="btn ghost" onclick="loadMarket()" style="margin-top:8px">Retry</button>'; }
 }
 
 function renderFlags(p){
