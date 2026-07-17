@@ -118,6 +118,10 @@
   .range .est{font-size:12px; color:var(--ink-soft); margin-top:6px}
   .rent-card{background:linear-gradient(180deg,#f4f7f7,#eaf0f0); border:1px solid var(--line); border-radius:16px; padding:16px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px}
   .rent-card .rent-big{font-family:var(--serif); font-size:26px; font-weight:500; color:var(--slate-deep); line-height:1.1}
+  .rent-card .rent-edit{display:flex; align-items:baseline; gap:1px}
+  .rent-card .rent-cur,.rent-card .rent-per{font-family:var(--serif); color:var(--slate-deep); font-size:19px}
+  .rent-card .rent-input{font-family:var(--serif); font-size:26px; font-weight:500; color:var(--slate-deep); border:none; border-bottom:1px dashed var(--slate); background:transparent; width:110px; padding:2px 0; -webkit-appearance:none; appearance:none}
+  .rent-card .rent-input:focus{outline:none; border-bottom:2px solid var(--slate)}
   .rent-card .rent-range2{font-size:12px; color:var(--ink-soft); margin-top:3px}
   .rent-card .rent-tag{font-family:var(--sans); font-size:10px; letter-spacing:.14em; text-transform:uppercase; font-weight:600; color:#fff; background:var(--slate); padding:6px 13px; border-radius:100px; flex:none}
 
@@ -127,6 +131,10 @@
   .comps th{font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--taupe); font-weight:600}
   .comps tr.subj td{background:var(--cream); font-weight:600}
   .comps .sub-note{font-size:11px; color:var(--ink-soft)}
+  .comp-status{display:inline-block; font-size:9.5px; letter-spacing:.04em; text-transform:uppercase; font-weight:700; padding:1px 8px; border-radius:100px; margin-top:4px}
+  .comp-status.sold{background:#ecebe8; color:#6f6a63}
+  .comp-status.active{background:var(--good-bg); color:var(--good)}
+  .comp-status.pending{background:#fbf1e0; color:#a9773a}
 
   .flags{display:flex; flex-direction:column; gap:8px; margin-top:8px}
   .flag{display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:12px; padding:10px 12px}
@@ -243,11 +251,14 @@
       <div id="rentSection">
         <div class="section-label"><span class="eyebrow">Rental estimate · for investors</span></div>
         <div class="rent-card">
-          <div>
-            <div class="rent-big" id="rRent"></div>
+          <div class="rent-edit">
+            <span class="rent-cur">$</span>
+            <input id="rRent" class="rent-input" type="number" inputmode="numeric" oninput="rentEdited()">
+            <span class="rent-per">/mo</span>
           </div>
           <div class="rent-tag">Rent</div>
         </div>
+        <p class="attr-note">Tap the rent to edit it if you know a better number.</p>
       </div>
 
       <div class="section-label"><span class="eyebrow">Nearby comps</span></div>
@@ -301,6 +312,18 @@ const API_BASE = "https://api.rentcast.io/v1";
 const money = n => (n==null||isNaN(n)) ? "—" : "$"+Math.round(n).toLocaleString("en-US");
 let current = null;
 let lastShareBlob = null;
+
+// Normalize a comp's listing status to Sold / Active / Pending
+function compStatus(c){
+  const raw = ((c.status||c.mlsStatus||c.standardStatus||c.listingType||"")+"").toLowerCase();
+  if(raw.indexOf("pend")>=0 || raw.indexOf("contract")>=0) return "Pending";
+  if(raw.indexOf("active")>=0) return "Active";
+  if(raw.indexOf("sold")>=0 || raw.indexOf("closed")>=0 || raw.indexOf("inactive")>=0) return "Sold";
+  if(c.removedDate || c.lastSalePrice) return "Sold";
+  if(c.status) return c.status;
+  return "Sold";
+}
+function statusChip(s){ if(!s) return ''; return '<div class="comp-status '+String(s).toLowerCase()+'">'+s+'</div>'; }
 
 // ===== Pure-JS SHA-256 (works over http and https) =====
 function sha256(ascii){
@@ -362,12 +385,19 @@ function sha256(ascii){
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
 function storageOK(){ try{ localStorage.setItem('opcc_t','1'); localStorage.removeItem('opcc_t'); return true; }catch(e){ return false; } }
+// Long-lived cookie backup so the key/password survive even if localStorage is cleared
+function setCookie(n,v){ try{ const d=new Date(); d.setTime(d.getTime()+3650*864e5); document.cookie=n+"="+encodeURIComponent(v)+";expires="+d.toUTCString()+";path=/;SameSite=Lax"; }catch(e){} }
+function getCookie(n){ try{ const m=document.cookie.match('(^|;)\\s*'+n+'\\s*=\\s*([^;]+)'); return m?decodeURIComponent(m.pop()):''; }catch(e){ return ''; } }
+function store(k,v){ lsSet(k,v); setCookie(k,v); }               // write to both
+function load(k){ let v=lsGet(k); if(!v){ v=getCookie(k); if(v) lsSet(k,v); } return v||""; } // read either, restore missing
+// Ask the OS to keep this app's storage from being evicted
+try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
 
 // ===== Lock =====
 function unlock(){
   try{
     const h = sha256(document.getElementById('pwInput').value.trim());
-    if(h===PW_HASH){ lsSet('opcc_unlocked','1'); showApp(); }
+    if(h===PW_HASH){ store('opcc_unlocked','1'); showApp(); }
     else document.getElementById('pwErr').classList.remove('hidden');
   }catch(e){ document.getElementById('pwErr').classList.remove('hidden'); }
 }
@@ -381,14 +411,15 @@ function showApp(){
   if(!storageOK()){ w.textContent = "Heads up: this window can't save homes (looks like a Private/Incognito window). Open the app in a normal window to keep saved homes."; w.classList.remove('hidden'); }
   else w.classList.add('hidden');
 }
-if(lsGet('opcc_unlocked')==='1'){ window.addEventListener('DOMContentLoaded', showApp); }
+if(load('opcc_unlocked')==='1'){ window.addEventListener('DOMContentLoaded', showApp); }
 
 // ===== API key =====
-function getKey(){ return lsGet('opcc_apikey')||""; }
+function getKey(){ return load('opcc_apikey'); }
 function saveKey(){
   const k = document.getElementById('keyInput').value.trim();
   if(!k){ toast("Paste a key first"); return; }
-  if(!lsSet('opcc_apikey', k)){ toast("This window can't save the key (Private mode). Use a normal window."); return; }
+  const okLS = lsSet('opcc_apikey', k); setCookie('opcc_apikey', k);
+  if(!okLS && !getCookie('opcc_apikey')){ toast("This window can't save the key. Use a normal window."); return; }
   toast("Key saved on this device"); goHome();
 }
 function openSettings(){ showOnly('settingsScreen'); document.getElementById('keyInput').value = getKey(); updateUsage(); }
@@ -446,7 +477,8 @@ function mapProperty(q, val, rent, prop){
   const comps = (val.comparables||[]).slice(0,4).map(c=>({
     a: c.formattedAddress || c.addressLine1 || "Comp",
     p: c.price ?? c.lastSalePrice, s: c.squareFootage ?? c.squareFeet,
-    hoa: (c.hoa && (c.hoa.fee ?? c.hoa)) ?? null
+    hoa: (c.hoa && (c.hoa.fee ?? c.hoa)) ?? null,
+    status: compStatus(c)
   }));
   const taxObj = prop && (prop.propertyTaxes || prop.taxAssessments);
   let tax = null;
@@ -497,14 +529,14 @@ function renderResult(){
   const rentSection = document.getElementById('rentSection');
   if(p.rent){
     rentSection.classList.remove('hidden');
-    document.getElementById('rRent').textContent = money(p.rent)+"/mo";
+    document.getElementById('rRent').value = Math.round(p.rent);
   } else { rentSection.classList.add('hidden'); }
 
   // comps
   const subjPsf = (p.est&&p.sqft)? p.est/p.sqft : null;
   let rows = '<tr class="subj"><td>This home<div class="sub-note">subject</div></td><td>'+money(p.est)+'</td><td>'+(p.sqft? p.sqft.toLocaleString():"—")+'</td><td>'+money(subjPsf)+'</td></tr>';
   if(p.comps.length===0) rows += '<tr><td colspan="4" class="sub-note">No comps returned for this address.</td></tr>';
-  p.comps.forEach(c=>{ rows += '<tr><td>'+c.a+'</td><td>'+money(c.p)+'</td><td>'+(c.s? c.s.toLocaleString():"—")+'</td><td>'+money(c.p&&c.s? c.p/c.s:null)+'</td></tr>'; });
+  p.comps.forEach(c=>{ rows += '<tr><td>'+c.a+statusChip(c.status)+'</td><td>'+money(c.p)+'</td><td>'+(c.s? c.s.toLocaleString():"—")+'</td><td>'+money(c.p&&c.s? c.p/c.s:null)+'</td></tr>'; });
   document.getElementById('rComps').innerHTML = rows;
 
   renderFlags(p);
@@ -537,7 +569,7 @@ async function recalcEstimate(){
     bumpUsage();
     if(valRes.ok){
       const val=await valRes.json();
-      if(val.comparables){ current.comps=(val.comparables||[]).slice(0,4).map(c=>({a:c.formattedAddress||c.addressLine1||"Comp",p:c.price??c.lastSalePrice,s:c.squareFootage??c.squareFeet,hoa:(c.hoa&&(c.hoa.fee??c.hoa))??null})); }
+      if(val.comparables){ current.comps=(val.comparables||[]).slice(0,4).map(c=>({a:c.formattedAddress||c.addressLine1||"Comp",p:c.price??c.lastSalePrice,s:c.squareFootage??c.squareFeet,hoa:(c.hoa&&(c.hoa.fee??c.hoa))??null,status:compStatus(c)})); }
       const psfs=current.comps.map(c=>(c.p&&c.s)?c.p/c.s:null).filter(x=>x!=null).sort((a,b)=>a-b);
       if(current.sqft && psfs.length>=2){
         const mid=psfs.length%2?psfs[(psfs.length-1)/2]:(psfs[psfs.length/2-1]+psfs[psfs.length/2])/2;
@@ -593,12 +625,9 @@ function calc(){
     '<div class="calc-line"><span>HOA</span><span>'+money(hoa)+'</span></div>'+
     '<div class="calc-line"><span>Insurance</span><span>'+money(ins)+'</span></div>'+
     '<div class="calc-line total"><span>Est. monthly payment</span><span>'+money(total)+'</span></div>';
-  if(current && current.rent){
-    const flow = current.rent - total;
-    html += '<div class="calc-line cash"><span>Est. rent − payment</span><span class="'+(flow>=0?'pos':'neg')+'">'+(flow>=0?'+':'')+money(flow)+'/mo</span></div>';
-  }
   document.getElementById('cOut').innerHTML = html;
 }
+function rentEdited(){ if(!current) return; const v=parseFloat(document.getElementById('rRent').value); current.rent = isNaN(v)?null:v; }
 
 // ===== Save homes =====
 function saveHouse(){
