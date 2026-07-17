@@ -360,14 +360,29 @@ function mapProperty(q, val, prop){
   let tax = null;
   if(taxObj){ const yrs = Object.keys(taxObj).sort(); const last = taxObj[yrs[yrs.length-1]]; tax = last && (last.total ?? last.amount ?? last.value); }
   const hoa = prop && prop.hoa && (prop.hoa.fee ?? prop.hoa) || null;
+
+  // Comp-based valuation: use the $/sqft of nearby comps for a tighter, defensible range,
+  // instead of RentCast's very wide AVM confidence band.
+  const sqft = (prop && prop.squareFootage) || null;
+  const psfs = comps.map(c => (c.p && c.s) ? c.p/c.s : null).filter(x => x != null).sort((a,b)=>a-b);
+  let est = val.price ?? null, lo = null, hi = null;
+  if (sqft && psfs.length >= 2) {
+    const mid = psfs.length % 2 ? psfs[(psfs.length-1)/2] : (psfs[psfs.length/2-1]+psfs[psfs.length/2])/2;
+    est = Math.round(mid * sqft / 1000) * 1000;                 // comp median $/sqft × sqft
+    lo  = Math.round(psfs[0] * sqft / 1000) * 1000;             // lowest comp $/sqft
+    hi  = Math.round(psfs[psfs.length-1] * sqft / 1000) * 1000; // highest comp $/sqft
+  } else {
+    lo = val.priceRangeLow ?? (val.price ? Math.round(val.price*0.97) : null);
+    hi = val.priceRangeHigh ?? (val.price ? Math.round(val.price*1.03) : null);
+  }
+
   return {
     addr: (prop && prop.formattedAddress) || val.formattedAddress || q,
     beds: (prop && (prop.bedrooms)) ?? null,
     baths: (prop && (prop.bathrooms)) ?? null,
-    sqft: (prop && (prop.squareFootage)) ?? null,
-    est: val.price ?? null,
-    lo: val.priceRangeLow ?? (val.price? Math.round(val.price*0.97):null),
-    hi: val.priceRangeHigh ?? (val.price? Math.round(val.price*1.03):null),
+    sqft: sqft,
+    est, lo, hi,
+    rentcastEst: val.price ?? null,
     comps, hoa, tax, assessment:null, warrantable:null
   };
 }
@@ -378,7 +393,9 @@ function renderResult(){
   const facts=[]; if(p.beds!=null)facts.push(p.beds+" bd"); if(p.baths!=null)facts.push(p.baths+" ba"); if(p.sqft!=null)facts.push(p.sqft.toLocaleString()+" sqft");
   document.getElementById('rFacts').innerHTML = facts.map(f=>`<span>${f}</span>`).join('');
   document.getElementById('rRange').textContent = (p.lo&&p.hi)? money(p.lo)+" – "+money(p.hi) : money(p.est);
-  document.getElementById('rEst').textContent = (p.est&&p.sqft)? "Central estimate: "+money(p.est)+" · "+money(p.est/p.sqft)+"/sqft" : (p.est? "Central estimate: "+money(p.est):"");
+  let estLine = (p.est&&p.sqft)? "Comp-based: "+money(p.est)+" · "+money(p.est/p.sqft)+"/sqft" : (p.est? "Comp-based: "+money(p.est):"");
+  if(p.rentcastEst && p.rentcastEst!==p.est) estLine += " · RentCast AVM: "+money(p.rentcastEst);
+  document.getElementById('rEst').textContent = estLine;
   const subjPsf = (p.est&&p.sqft)? p.est/p.sqft : null;
   let rows = `<tr class="subj"><td>This home<div class="sub-note">subject</div></td><td>${money(p.est)}</td><td>${p.sqft? p.sqft.toLocaleString():"—"}</td><td>${money(subjPsf)}</td></tr>`;
   if(p.comps.length===0) rows += `<tr><td colspan="4" class="sub-note">No comps returned for this address.</td></tr>`;
