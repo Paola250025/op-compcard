@@ -215,16 +215,44 @@
     width:32px; height:2.5px; border-radius:0 0 3px 3px; background:linear-gradient(90deg,var(--slate),var(--slate-deep))}
   .nav-btn svg{width:23px; height:23px; stroke-width:1.6; transition:transform .15s}
   .nav-btn.active svg{transform:scale(1.08)}
+  .nav-badge{position:absolute; top:4px; right:50%; transform:translateX(16px); background:linear-gradient(155deg,var(--gold),#8f7345); color:#fff;
+    font-size:9px; font-weight:700; min-width:17px; height:17px; border-radius:100px; display:flex; align-items:center; justify-content:center; padding:0 5px;
+    box-shadow:0 2px 6px rgba(169,141,93,.4); border:2px solid #fff}
+
+  /* ── Screen transitions ── */
+  .screen{transition:opacity .2s ease, transform .2s ease}
+
+  /* ── Notes search & sort bar ── */
+  .notes-toolbar{display:flex; gap:8px; margin:10px 0 6px; align-items:center}
+  .notes-search{flex:1; padding:10px 14px 10px 36px; border:1.5px solid var(--line); border-radius:12px; background:var(--cream); font-size:14px; color:var(--ink);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a8178' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:12px center}
+  .notes-search:focus{outline:none; border-color:var(--gold); background-color:#fff;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a98d5d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E")}
+  .sort-btn{background:var(--bg); border:1.5px solid var(--line); border-radius:12px; padding:10px 12px; color:var(--slate); cursor:pointer; display:flex; align-items:center; gap:4px; font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+    transition:all .2s ease; white-space:nowrap}
+  .sort-btn:hover{border-color:var(--slate); background:rgba(95,122,135,.04)}
+  .sort-btn svg{width:16px; height:16px}
+  .notes-count{font-size:11px; color:var(--taupe); text-align:right; margin:2px 0 8px; font-weight:500}
 
   /* ── Notes list ── */
   .meetings{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
   .meeting-item{border:1px solid var(--line); border-radius:16px; padding:15px 18px; background:var(--panel); display:flex; justify-content:space-between; align-items:flex-start; gap:10px; cursor:pointer;
-    transition:all .2s ease; box-shadow:0 2px 8px rgba(43,41,38,.04)}
+    transition:all .25s ease; box-shadow:0 2px 8px rgba(43,41,38,.04); position:relative; overflow:hidden}
   .meeting-item:hover{box-shadow:var(--shadow-lg); transform:translateY(-1px); border-color:rgba(95,122,135,.2)}
+  .meeting-item:active{transform:scale(.98); box-shadow:0 1px 4px rgba(43,41,38,.06)}
   .meeting-item .mi-title{font-weight:600; font-size:14px; margin:0 0 3px}
   .meeting-item .mi-meta{font-size:12px; color:var(--ink-soft)}
   .meeting-item .mi-summary{font-size:12.5px; color:var(--ink-soft); margin-top:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
   .mi-tags{display:flex; gap:6px; margin-top:6px; flex-wrap:wrap}
+  .mi-actions{display:flex; gap:6px; margin-top:8px}
+  .mi-action{background:var(--cream); border:1px solid var(--line); border-radius:8px; padding:5px 10px; font-size:10px; font-weight:600; color:var(--slate); letter-spacing:.03em; text-transform:uppercase;
+    transition:all .15s ease; cursor:pointer}
+  .mi-action:hover{background:var(--bg); border-color:var(--slate); transform:translateY(-1px)}
+  .mi-action.share{color:var(--gold); border-color:rgba(169,141,93,.3)}
+  .mi-action.share:hover{background:rgba(169,141,93,.06); border-color:var(--gold)}
+  .mi-action.del{color:var(--bad); border-color:rgba(177,84,58,.2)}
+  .mi-action.del:hover{background:var(--bad-bg); border-color:var(--bad)}
   .tag{font-size:10px; letter-spacing:.04em; text-transform:uppercase; font-weight:600; padding:3px 10px; border-radius:100px}
   .tag.t-showing{background:#eaf0f0; color:var(--slate-deep)}
   .tag.t-call{background:#f0ecea; color:#8a6f5e}
@@ -262,10 +290,16 @@
     border:3px solid rgba(177,84,58,.5); animation:mic-pulse 1.8s ease-in-out infinite; pointer-events:none}
   @keyframes mic-pulse{0%,100%{opacity:1; transform:scale(1)} 50%{opacity:0; transform:scale(1.4)}}
   .mic-btn svg{width:30px; height:30px; pointer-events:none}
+  .mic-btn.paused{background:linear-gradient(155deg,#c49044,#8f7345);
+    box-shadow:0 8px 28px rgba(169,141,93,.35), inset 0 2px 0 rgba(255,255,255,.12)}
+  .mic-btn.paused::after{content:''; position:absolute; inset:-8px; border-radius:50%;
+    border:3px dashed rgba(169,141,93,.5); animation:mic-pause-spin 4s linear infinite; pointer-events:none}
+  @keyframes mic-pause-spin{0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)}}
   .rec-hint{font-size:12px; color:var(--ink-soft); margin-top:10px}
   .rec-status{font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:600; margin-top:8px}
   .rec-status.live{color:var(--bad)}
   .rec-status.ready{color:var(--taupe)}
+  .rec-status.pause{color:var(--gold)}
 
   .transcript-box{border:1px solid var(--line); border-radius:14px; background:var(--panel); padding:16px; min-height:120px; max-height:320px; overflow-y:auto; margin-top:14px}
   .transcript-box .seg{margin-bottom:8px; line-height:1.55}
@@ -276,12 +310,20 @@
 
   /* ── Note detail ── */
   .note-head{margin-bottom:18px}
-  .note-head .nh-title{font-family:var(--serif); font-size:22px; font-weight:500; margin:0 0 4px; color:var(--ink)}
+  .note-head .nh-title{font-family:var(--serif); font-size:22px; font-weight:500; margin:0 0 4px; color:var(--ink);
+    background:none; border:none; border-bottom:1.5px solid transparent; width:100%; padding:2px 0; transition:border-color .2s}
+  .note-head .nh-title:focus{outline:none; border-bottom-color:var(--gold)}
   .note-head .nh-date{font-size:12.5px; color:var(--ink-soft)}
   .note-section{margin-top:18px}
   .note-section .ns-label{font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--taupe); font-weight:600; margin-bottom:6px}
   .summary-input{width:100%; min-height:80px; padding:12px 14px; border:1px solid var(--line); border-radius:12px; background:var(--cream); color:var(--ink); font-family:var(--sans); font-size:14px; line-height:1.5; resize:vertical}
   .summary-input:focus{outline:2px solid var(--slate); outline-offset:1px; background:#fff}
+  .nd-people-input{width:100%; padding:10px 14px; border:1px solid var(--line); border-radius:12px; background:var(--cream); color:var(--ink); font-size:14px; font-family:var(--sans); transition:all .2s}
+  .nd-people-input:focus{outline:none; border-color:var(--gold); background:#fff}
+  .export-bar{margin-top:14px; text-align:center}
+  .export-btn{background:none; border:1.5px solid var(--line); border-radius:12px; padding:10px 20px; font-size:12px; font-weight:600; color:var(--slate); letter-spacing:.04em; text-transform:uppercase; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:6px}
+  .export-btn:hover{border-color:var(--slate); background:rgba(95,122,135,.04); transform:translateY(-1px)}
+  .export-btn svg{width:16px; height:16px}
   .pipeline-row{display:flex; gap:6px; flex-wrap:wrap}
   .pipe-btn{background:var(--bg); border:1.5px solid var(--line); border-radius:100px; padding:8px 14px; font-size:11px; font-weight:600; color:var(--ink-soft); letter-spacing:.03em; transition:all .2s ease;
     box-shadow:0 1px 4px rgba(43,41,38,.04)}
@@ -437,11 +479,25 @@
       <button class="btn" onclick="newMeeting()" style="margin-top:8px">Record</button>
 
       <div class="section-label"><span class="eyebrow">Saved notes</span></div>
+      <div class="notes-toolbar" id="notesToolbar" style="display:none">
+        <input type="text" class="notes-search" id="notesSearch" placeholder="Search notes…" oninput="filterNotes()">
+        <button class="sort-btn" onclick="cycleSort()" id="sortBtn" title="Sort notes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M6 12h12M9 18h6"/></svg>
+          <span id="sortLabel">Newest</span>
+        </button>
+      </div>
+      <div class="notes-count" id="notesCount"></div>
       <ul id="meetingsList" class="meetings"></ul>
       <div id="meetingsEmpty" class="empty-state">
         <div class="es-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
         <p class="es-title">No notes yet</p>
         <p class="es-sub">Tap &ldquo;Record&rdquo; to start a live transcription.</p>
+      </div>
+      <div class="export-bar" id="exportBar" style="display:none">
+        <button class="export-btn" onclick="exportAllNotes()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export all notes
+        </button>
       </div>
     </div>
 
@@ -471,6 +527,7 @@
       <div class="transcript-box" id="liveTranscript"><div class="transcript-empty">Transcript will appear here as you speak&hellip;</div></div>
       <div class="btn-row" style="margin-top:18px">
         <button class="btn ghost" onclick="cancelRecording()">Cancel</button>
+        <button class="btn ghost" id="pauseRecBtn" onclick="pauseRec()" style="display:none">Pause</button>
         <button class="btn" id="saveRecBtn" onclick="saveRecording()" disabled>Save note</button>
       </div>
     </div>
@@ -480,7 +537,7 @@
       <button class="back" onclick="backToNotes()">&larr; Back</button>
       <div class="note-head">
         <div class="mi-tags" id="ndTags"></div>
-        <h2 class="nh-title" id="ndTitle"></h2>
+        <input type="text" class="nh-title" id="ndTitle" oninput="autoSaveNote()">
         <div class="nh-date" id="ndDate"></div>
       </div>
       <div class="note-section">
@@ -498,7 +555,7 @@
       </div>
       <div class="note-section">
         <div class="ns-label">People &amp; context</div>
-        <p id="ndParticipants" style="font-size:14px; color:var(--ink-soft); margin:0"></p>
+        <input type="text" class="nd-people-input" id="ndParticipants" placeholder="e.g. Olaf, client John, at 123 Main St" oninput="autoSaveNote()">
       </div>
       <div class="note-section">
         <div class="ns-label">Full transcript</div>
@@ -524,6 +581,7 @@
       <button class="nav-btn" id="navNotes" onclick="switchTab('notes')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
         <span>Notes</span>
+        <span class="nav-badge" id="notesBadge" style="display:none"></span>
       </button>
     </nav>
   </div>
@@ -630,7 +688,7 @@ function showApp(){
   document.getElementById('lockScreen').classList.add('hidden');
   document.getElementById('mainApp').classList.remove('hidden');
   if(!getKey()) openSettings(); else goHome();
-  renderRecent(); updateUsage();
+  renderRecent(); updateUsage(); updateNotesBadge();
   // warn if this browser can't save (e.g. private window)
   const w = document.getElementById('storeWarn');
   if(!storageOK()){ w.textContent = "Heads up: this window can't save homes (looks like a Private/Incognito window). Open the app in a normal window to keep saved homes."; w.classList.remove('hidden'); }
@@ -1089,29 +1147,73 @@ function initSpeech(){
   return r;
 }
 
-function toggleRec(){ if(isRecording) stopRec(); else startRec(); }
+let isPaused=false, pausedElapsed=0;
+
+function haptic(ms){ try{if(navigator.vibrate)navigator.vibrate(ms||30);}catch(e){} }
+
+function toggleRec(){
+  haptic(30);
+  if(isPaused){ resumeRec(); return; }
+  if(isRecording) stopRec(); else startRec();
+}
 
 function startRec(){
   recognition=initSpeech();
   if(!recognition){ toast('Speech recognition not supported. Use Chrome or Safari.'); return; }
-  segments=[]; interimText=''; recStartTime=Date.now(); isRecording=true;
+  segments=[]; interimText=''; recStartTime=Date.now(); isRecording=true; isPaused=false; pausedElapsed=0;
   recSession=0; processedKeys.clear();
   try{ recognition.start(); }catch(e){}
-  document.getElementById('micBtn').classList.add('recording');
+  var mic=document.getElementById('micBtn');
+  mic.classList.add('recording'); mic.classList.remove('paused');
   document.getElementById('recStatus').textContent='Recording…';
   document.getElementById('recStatus').className='rec-status live';
   document.getElementById('saveRecBtn').disabled=false;
+  document.getElementById('pauseRecBtn').style.display='';
   recTimerInterval=setInterval(updateRecTimer,1000);
   renderLiveTranscript();
 }
 
-function stopRec(){
+function pauseRec(){
+  if(!isRecording||isPaused) return;
+  haptic(50);
+  isPaused=true;
+  pausedElapsed=Date.now()-recStartTime;
+  if(recognition){ try{recognition.stop();}catch(e){} recognition=null; }
   isRecording=false;
+  if(recTimerInterval){clearInterval(recTimerInterval); recTimerInterval=null;}
+  var mic=document.getElementById('micBtn');
+  mic.classList.remove('recording'); mic.classList.add('paused');
+  document.getElementById('recStatus').textContent='Paused — tap mic to resume';
+  document.getElementById('recStatus').className='rec-status pause';
+  document.getElementById('pauseRecBtn').textContent='Resume';
+}
+
+function resumeRec(){
+  if(!isPaused) return;
+  haptic(30);
+  recognition=initSpeech();
+  if(!recognition){ toast('Speech recognition not supported.'); return; }
+  isPaused=false; isRecording=true;
+  recStartTime=Date.now()-pausedElapsed;
+  recSession++; processedKeys.clear();
+  try{ recognition.start(); }catch(e){}
+  var mic=document.getElementById('micBtn');
+  mic.classList.add('recording'); mic.classList.remove('paused');
+  document.getElementById('recStatus').textContent='Recording…';
+  document.getElementById('recStatus').className='rec-status live';
+  document.getElementById('pauseRecBtn').textContent='Pause';
+  recTimerInterval=setInterval(updateRecTimer,1000);
+}
+
+function stopRec(){
+  isRecording=false; isPaused=false;
   if(recognition){ try{recognition.stop();}catch(e){} recognition=null; }
   if(recTimerInterval){clearInterval(recTimerInterval); recTimerInterval=null;}
-  document.getElementById('micBtn').classList.remove('recording');
+  var mic=document.getElementById('micBtn');
+  mic.classList.remove('recording'); mic.classList.remove('paused');
   document.getElementById('recStatus').textContent='Stopped';
   document.getElementById('recStatus').className='rec-status ready';
+  document.getElementById('pauseRecBtn').style.display='none';
 }
 
 function updateRecTimer(){
@@ -1143,11 +1245,14 @@ function newMeeting(){
   document.getElementById('recTimer').textContent='0:00';
   document.getElementById('liveTranscript').innerHTML='<div class="transcript-empty">Transcript will appear here as you speak…</div>';
   document.getElementById('saveRecBtn').disabled=true;
+  document.getElementById('pauseRecBtn').style.display='none';
+  document.getElementById('pauseRecBtn').textContent='Pause';
   document.getElementById('recStatus').textContent='Tap to record';
   document.getElementById('recStatus').className='rec-status ready';
+  document.getElementById('micBtn').classList.remove('recording','paused');
   document.querySelectorAll('#typeRow .type-btn').forEach(function(b){b.classList.remove('active');});
   document.querySelector('#typeRow .type-btn[data-type="showing"]').classList.add('active');
-  recType='showing'; segments=[]; interimText=''; isRecording=false;
+  recType='showing'; segments=[]; interimText=''; isRecording=false; isPaused=false; pausedElapsed=0;
 }
 
 function cancelRecording(){ stopRec(); showOnly('notesHomeScreen'); renderMeetings(); }
@@ -1183,43 +1288,157 @@ function buildSummary(segs, title, type){
 
 function getMeetings(){ try{return JSON.parse(lsGet('opcc_meetings')||'[]');}catch(e){return [];} }
 
+let notesSort='newest';
+function cycleSort(){
+  var modes=['newest','oldest','type','pipeline'];
+  var idx=modes.indexOf(notesSort);
+  notesSort=modes[(idx+1)%modes.length];
+  document.getElementById('sortLabel').textContent=notesSort.charAt(0).toUpperCase()+notesSort.slice(1);
+  renderMeetings();
+}
+
+function filterNotes(){ renderMeetings(); }
+
+function sortMeetings(arr){
+  var sorted=arr.slice();
+  if(notesSort==='oldest') sorted.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+  else if(notesSort==='type') sorted.sort(function(a,b){return (a.type||'').localeCompare(b.type||'');});
+  else if(notesSort==='pipeline'){
+    var order={lead:0,'follow-up':1,contract:2,closed:3};
+    sorted.sort(function(a,b){return (order[a.pipeline]||0)-(order[b.pipeline]||0);});
+  }
+  return sorted;
+}
+
+function updateNotesBadge(){
+  var c=getMeetings().length;
+  var badge=document.getElementById('notesBadge');
+  if(badge){
+    if(c>0){ badge.textContent=c; badge.style.display=''; }
+    else badge.style.display='none';
+  }
+}
+
 function renderMeetings(){
-  const meetings=getMeetings();
-  const list=document.getElementById('meetingsList');
-  document.getElementById('meetingsEmpty').style.display=meetings.length?'none':'block';
-  list.innerHTML=meetings.map(function(m,i){
-    const d=new Date(m.date);
-    const dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' at '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    const durStr=m.duration?Math.floor(m.duration/60)+'m '+m.duration%60+'s':'';
-    const typeClass='t-'+(m.type||'general');
-    const typeLabel=(m.type||'general').replace(/-/g,' ');
-    let tags='<span class="tag '+typeClass+'">'+typeLabel+'</span>';
+  var meetings=getMeetings();
+  var toolbar=document.getElementById('notesToolbar');
+  var exportBar=document.getElementById('exportBar');
+  toolbar.style.display=meetings.length?'flex':'none';
+  exportBar.style.display=meetings.length>=2?'':'none';
+
+  var query=(document.getElementById('notesSearch').value||'').trim().toLowerCase();
+  var filtered=meetings;
+  if(query){
+    filtered=meetings.filter(function(m){
+      return (m.title||'').toLowerCase().indexOf(query)>=0 ||
+        (m.summary||'').toLowerCase().indexOf(query)>=0 ||
+        (m.participants||'').toLowerCase().indexOf(query)>=0 ||
+        (m.type||'').toLowerCase().indexOf(query)>=0 ||
+        (m.pipeline||'').toLowerCase().indexOf(query)>=0;
+    });
+  }
+  filtered=sortMeetings(filtered);
+
+  var countEl=document.getElementById('notesCount');
+  if(meetings.length){
+    countEl.textContent=filtered.length+(filtered.length!==meetings.length?' of ':' ')+'note'+(meetings.length===1?'':'s');
+  } else countEl.textContent='';
+
+  var list=document.getElementById('meetingsList');
+  document.getElementById('meetingsEmpty').style.display=filtered.length?'none':'block';
+  list.innerHTML=filtered.map(function(m){
+    var origIdx=meetings.indexOf(m);
+    var d=new Date(m.date);
+    var dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' at '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    var durStr=m.duration?Math.floor(m.duration/60)+'m '+m.duration%60+'s':'';
+    var typeClass='t-'+(m.type||'general');
+    var typeLabel=(m.type||'general').replace(/-/g,' ');
+    var tags='<span class="tag '+typeClass+'">'+typeLabel+'</span>';
     if(m.pipeline){tags+='<span class="tag p-'+m.pipeline+'">'+m.pipeline.replace(/-/g,' ')+'</span>';}
-    return '<li class="meeting-item" onclick="openNote('+i+')"><div style="flex:1;min-width:0">'+
+    var actions='<div class="mi-actions">'+
+      '<button class="mi-action share" onclick="event.stopPropagation();quickShare('+origIdx+')">Share</button>'+
+      '<button class="mi-action del" onclick="event.stopPropagation();quickDelete('+origIdx+')">Delete</button>'+
+      '</div>';
+    return '<li class="meeting-item" onclick="openNote('+origIdx+')"><div style="flex:1;min-width:0">'+
       '<div class="mi-title">'+escHtml(m.title)+'</div>'+
       '<div class="mi-meta">'+dateStr+(durStr?' · '+durStr:'')+'</div>'+
       (m.summary?'<div class="mi-summary">'+escHtml(m.summary)+'</div>':'')+
-      '<div class="mi-tags">'+tags+'</div></div></li>';
+      '<div class="mi-tags">'+tags+'</div>'+actions+'</div></li>';
   }).join('');
+  updateNotesBadge();
+}
+
+function quickShare(i){
+  var meetings=getMeetings(); if(!meetings[i]) return;
+  var m=meetings[i];
+  var d=new Date(m.date);
+  var dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  var text='Meeting Notes\n'+m.title+'\n'+dateStr+'\n\n'+(m.summary||'No summary')+
+    '\n\n— Olaf & Paola · Homes Buy Olaf\nhomesbuyolaf.com';
+  if(navigator.share){
+    navigator.share({title:m.title, text:text}).catch(function(){});
+  } else {
+    try{navigator.clipboard.writeText(text); toast('Copied to clipboard');}
+    catch(e){toast('Could not share');}
+  }
+}
+
+function quickDelete(i){
+  if(!confirm('Delete this note?')) return;
+  var meetings=getMeetings();
+  meetings.splice(i,1);
+  lsSet('opcc_meetings',JSON.stringify(meetings));
+  toast('Note deleted');
+  renderMeetings();
+}
+
+function exportAllNotes(){
+  var meetings=getMeetings();
+  if(!meetings.length){ toast('No notes to export'); return; }
+  var lines=['O&P CompCard — All Notes','Exported: '+new Date().toLocaleString(),'','='.repeat(50),''];
+  meetings.forEach(function(m,i){
+    var d=new Date(m.date);
+    lines.push((i+1)+'. '+m.title);
+    lines.push('Date: '+d.toLocaleString());
+    lines.push('Type: '+(m.type||'general')+' | Pipeline: '+(m.pipeline||'—'));
+    if(m.participants) lines.push('People: '+m.participants);
+    if(m.summary){ lines.push(''); lines.push('Summary:'); lines.push(m.summary); }
+    if(m.segments&&m.segments.length){
+      lines.push(''); lines.push('Transcript:');
+      m.segments.forEach(function(seg){
+        var mm=Math.floor(seg.time/60), ss=seg.time%60;
+        lines.push('['+mm+':'+String(ss).padStart(2,'0')+'] '+seg.text);
+      });
+    }
+    lines.push(''); lines.push('-'.repeat(50)); lines.push('');
+  });
+  lines.push('— Homes Buy Olaf & Paola · homesbuyolaf.com');
+  var blob=new Blob([lines.join('\n')],{type:'text/plain'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='OP-Notes-'+new Date().toISOString().slice(0,10)+'.txt';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Notes exported');
 }
 
 function openNote(i){
-  const meetings=getMeetings(); if(!meetings[i]) return;
-  const m=meetings[i]; currentNoteId=m.id;
+  var meetings=getMeetings(); if(!meetings[i]) return;
+  var m=meetings[i]; currentNoteId=m.id;
   showOnly('noteDetailScreen');
-  document.getElementById('ndTitle').textContent=m.title;
-  const d=new Date(m.date);
-  const dateStr=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})+' at '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  const durStr=m.duration?' · '+Math.floor(m.duration/60)+'m '+m.duration%60+'s':'';
+  document.getElementById('ndTitle').value=m.title;
+  var d=new Date(m.date);
+  var dateStr=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})+' at '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  var durStr=m.duration?' · '+Math.floor(m.duration/60)+'m '+m.duration%60+'s':'';
   document.getElementById('ndDate').textContent=dateStr+durStr;
   document.getElementById('ndTags').innerHTML='<span class="tag t-'+(m.type||'general')+'">'+(m.type||'general').replace(/-/g,' ')+'</span>';
-  document.getElementById('ndParticipants').textContent=m.participants||'Not specified';
+  document.getElementById('ndParticipants').value=m.participants||'';
   document.getElementById('ndSummary').value=m.summary||'';
   document.querySelectorAll('#pipelineRow .pipe-btn').forEach(function(b){b.classList.toggle('active',b.dataset.pipe===(m.pipeline||'lead'));});
-  const trans=document.getElementById('ndTranscript');
+  var trans=document.getElementById('ndTranscript');
   if(m.segments&&m.segments.length){
     trans.innerHTML=m.segments.map(function(seg){
-      const mm=Math.floor(seg.time/60), ss=seg.time%60;
+      var mm=Math.floor(seg.time/60), ss=seg.time%60;
       return '<div class="seg"><span class="seg-time">'+mm+':'+String(ss).padStart(2,'0')+'</span> '+escHtml(seg.text)+'</div>';
     }).join('');
   } else { trans.innerHTML='<div style="color:var(--ink-soft);font-style:italic">No transcript recorded.</div>'; }
@@ -1227,11 +1446,15 @@ function openNote(i){
 
 function autoSaveNote(){
   if(!currentNoteId) return;
-  const meetings=getMeetings();
-  const idx=meetings.findIndex(function(m){return m.id===currentNoteId;});
+  var meetings=getMeetings();
+  var idx=meetings.findIndex(function(m){return m.id===currentNoteId;});
   if(idx<0) return;
+  var titleEl=document.getElementById('ndTitle');
+  if(titleEl&&titleEl.value) meetings[idx].title=titleEl.value;
   meetings[idx].summary=document.getElementById('ndSummary').value;
-  const activePipe=document.querySelector('#pipelineRow .pipe-btn.active');
+  var peopleEl=document.getElementById('ndParticipants');
+  if(peopleEl) meetings[idx].participants=peopleEl.value;
+  var activePipe=document.querySelector('#pipelineRow .pipe-btn.active');
   if(activePipe) meetings[idx].pipeline=activePipe.dataset.pipe;
   lsSet('opcc_meetings',JSON.stringify(meetings));
 }
@@ -1245,7 +1468,7 @@ function deleteNote(){
   showOnly('notesHomeScreen'); renderMeetings();
 }
 
-function backToNotes(){ autoSaveNote(); currentNoteId=null; showOnly('notesHomeScreen'); renderMeetings(); }
+function backToNotes(){ autoSaveNote(); currentNoteId=null; showOnly('notesHomeScreen'); renderMeetings(); updateNotesBadge(); }
 
 // ===== Share notes =====
 async function shareNote(mode){
