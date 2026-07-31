@@ -6,7 +6,7 @@
 <title>O&P CompCard</title>
 <meta name="description" content="Private comps and cost tool for Homes Buy Olaf & Paola.">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#5f7a87">
+<meta name="theme-color" content="#2a3d45">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -39,33 +39,42 @@
   /* Chess emblem (recreated logo motif) */
   .chess{font-family:"Segoe UI Symbol","Apple Symbols","Noto Sans Symbols2",var(--sans); color:var(--slate); letter-spacing:.06em; line-height:1}
 
-  .brand{background:var(--bg); border-bottom:1px solid var(--line); text-align:center; padding:calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px; position:relative}
-  .brand .chess{font-size:21px; display:block; margin-bottom:4px; letter-spacing:-.05em}
-  .brand h1{font-family:var(--sans); font-weight:800; font-size:19px; letter-spacing:.06em; margin:0; color:var(--wm-gray)}
-  .brand h1 .buy{color:var(--slate)} .brand h1 .amp{color:var(--slate)}
-  .brand .sub{font-family:var(--sans); font-size:9.5px; color:var(--taupe); margin-top:4px; letter-spacing:.28em; text-transform:uppercase; font-weight:600}
-  .brand .gear{position:absolute; right:14px; top:calc(env(safe-area-inset-top, 0px) + 12px); background:none; border:none; color:var(--taupe); font-size:19px}
+  .brand{background:linear-gradient(170deg,#3d555f 0%,#2a3d45 50%,#1f2e34 100%); border-bottom:none; text-align:center;
+    padding:calc(env(safe-area-inset-top, 0px) + 16px) 16px 18px; position:relative;
+    box-shadow:0 4px 20px rgba(31,46,52,.3)}
+  .brand .chess{font-size:24px; display:block; margin-bottom:6px; letter-spacing:-.05em; color:var(--gold); text-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .brand h1{font-family:var(--sans); font-weight:800; font-size:19px; letter-spacing:.06em; margin:0; color:rgba(255,255,255,.6)}
+  .brand h1 .buy{color:var(--gold)} .brand h1 .amp{color:var(--gold)}
+  .brand .sub{font-family:var(--sans); font-size:9.5px; color:rgba(255,255,255,.35); margin-top:6px; letter-spacing:.28em; text-transform:uppercase; font-weight:600}
+  .brand .gear{position:absolute; right:14px; top:calc(env(safe-area-inset-top, 0px) + 16px); background:none; border:none; color:rgba(255,255,255,.4); font-size:19px}
 
-  .screen{padding:20px 18px 8px}
-  .eyebrow{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--taupe); font-weight:600}
+  .screen{padding:22px 20px 8px}
+  .eyebrow{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--gold); font-weight:700}
 
   /* Lock */
   .lock{min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; padding:32px 22px; text-align:center;
-    background:radial-gradient(125% 80% at 50% 0%, #f2eee6 0%, var(--cream) 52%, #eaeeed 100%);}
-  .lock-card{background:var(--bg); border:1px solid var(--line); border-radius:24px; box-shadow:var(--shadow-lg); padding:38px 30px 32px; width:100%; max-width:360px}
-  .emblem{width:80px; height:80px; margin:0 auto 18px; border-radius:22px; background:linear-gradient(155deg,#7a9fad,#3d555f); color:#fff; display:flex; align-items:center; justify-content:center;
-    box-shadow:0 8px 24px rgba(76,101,112,.3), inset 0 1px 0 rgba(255,255,255,.12)}
-  .emblem .chess{color:#fff; font-size:38px}
-  .lock h2{font-family:var(--sans); font-weight:800; letter-spacing:.05em; font-size:17px; margin:0 0 6px; color:var(--wm-gray)}
-  .lock h2 .buy{color:var(--slate)} .lock h2 .amp{color:var(--slate)}
-  .lock .tagline{font-size:9px; letter-spacing:.28em; text-transform:uppercase; color:var(--taupe); font-weight:600; margin:0 0 20px}
-  .lock p.hint{color:var(--ink-soft); font-size:13px; margin:0 0 18px}
-  .lock-foot{margin-top:22px; font-size:11px; color:var(--taupe); letter-spacing:.05em}
+    background:linear-gradient(170deg,#2a3d45 0%,#1f2e34 40%,#1a2429 100%)}
+  .lock-card{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:28px;
+    box-shadow:0 16px 48px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.08); padding:42px 30px 36px; width:100%; max-width:360px;
+    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px)}
+  .emblem{width:88px; height:88px; margin:0 auto 20px; border-radius:24px;
+    background:linear-gradient(155deg,var(--gold),#7a6438); color:#fff; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 28px rgba(169,141,93,.4), inset 0 1px 0 rgba(255,255,255,.2)}
+  .emblem .chess{color:#fff; font-size:40px; text-shadow:0 2px 4px rgba(0,0,0,.15)}
+  .lock h2{font-family:var(--sans); font-weight:800; letter-spacing:.05em; font-size:18px; margin:0 0 6px; color:rgba(255,255,255,.6)}
+  .lock h2 .buy{color:var(--gold)} .lock h2 .amp{color:var(--gold)}
+  .lock .tagline{font-size:9px; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); font-weight:600; margin:0 0 22px; opacity:.7}
+  .lock p.hint{color:rgba(255,255,255,.45); font-size:13px; margin:0 0 18px}
+  .lock-foot{margin-top:22px; font-size:11px; color:rgba(255,255,255,.3); letter-spacing:.05em}
+  .lock input[type=password]{background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); color:#fff}
+  .lock input[type=password]::placeholder{color:rgba(255,255,255,.3)}
+  .lock input[type=password]:focus{outline:2px solid var(--gold); background:rgba(255,255,255,.12)}
 
   input,.field{font-family:var(--sans); font-size:16px}
   input[type=text],input[type=password],input[type=number]{
-    width:100%; padding:13px 14px; border:1px solid var(--line); border-radius:12px; background:var(--cream); color:var(--ink);}
-  input:focus{outline:2px solid var(--slate); outline-offset:1px; background:#fff}
+    width:100%; padding:14px 16px; border:1.5px solid var(--line); border-radius:14px; background:var(--cream); color:var(--ink);
+    transition:all .2s ease; box-shadow:inset 0 2px 4px rgba(43,41,38,.03)}
+  input:focus{outline:none; border-color:var(--gold); background:#fff; box-shadow:0 0 0 3px rgba(169,141,93,.12), inset 0 2px 4px rgba(43,41,38,.02)}
 
   .btn{background:linear-gradient(180deg,#6e8f9c,var(--slate-deep)); color:#fff; border:none; border-radius:14px; padding:14px 20px; font-size:14px;
     letter-spacing:.06em; text-transform:uppercase; font-weight:600; width:100%;
@@ -90,21 +99,25 @@
   .search-wrap input{flex:1}
   .search-wrap button{flex:none; width:auto; padding:13px 18px}
 
-  .section-label{margin:26px 0 10px; display:flex; align-items:center; gap:10px}
-  .section-label::after{content:""; flex:1; height:1px; background:var(--line)}
+  .section-label{margin:28px 0 12px; display:flex; align-items:center; gap:10px}
+  .section-label::after{content:""; flex:1; height:1px; background:linear-gradient(90deg,var(--line),transparent)}
 
   .recent{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
-  .recent li{border:1px solid var(--line); border-radius:12px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; gap:10px; background:var(--panel)}
+  .recent li{border:1px solid var(--line); border-radius:16px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; gap:10px; background:var(--panel);
+    box-shadow:0 2px 8px rgba(43,41,38,.04); transition:all .2s ease}
+  .recent li:hover{box-shadow:var(--shadow); transform:translateY(-1px)}
   .recent .addr{font-weight:500; font-size:14px}
   .recent .meta{font-size:12px; color:var(--ink-soft)}
   .recent .open{font-size:12px; color:var(--slate); border:none; background:none; text-transform:uppercase; letter-spacing:.08em; font-weight:600}
   .empty-note{color:var(--ink-soft); font-size:13px; font-style:italic}
   .home-intro{color:var(--ink-soft); font-size:13.5px; margin:7px 0 2px}
-  .empty-state{border:1.5px dashed var(--line); border-radius:16px; padding:26px 18px; text-align:center; background:var(--cream)}
-  .empty-state .es-mark{width:40px; height:40px; margin:0 auto 10px; border-radius:12px; background:var(--bg); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; color:var(--slate)}
-  .empty-state .es-title{font-family:var(--serif); font-size:16px; color:var(--ink); margin:0 0 4px}
+  .empty-state{border:1.5px dashed rgba(169,141,93,.25); border-radius:20px; padding:30px 20px; text-align:center; background:linear-gradient(180deg,var(--cream),#f5f1ea)}
+  .empty-state .es-mark{width:44px; height:44px; margin:0 auto 12px; border-radius:14px;
+    background:linear-gradient(155deg,rgba(169,141,93,.1),rgba(169,141,93,.05)); border:1px solid rgba(169,141,93,.15); display:flex; align-items:center; justify-content:center; color:var(--gold)}
+  .empty-state .es-title{font-family:var(--serif); font-size:17px; color:var(--ink); margin:0 0 5px; font-weight:500}
   .empty-state .es-sub{font-size:12.5px; color:var(--ink-soft); margin:0}
-  .app-foot{text-align:center; padding:22px 16px 30px; color:var(--taupe); font-size:10px; letter-spacing:.22em; text-transform:uppercase; font-weight:600}
+  .app-foot{text-align:center; padding:28px 16px 36px; color:var(--taupe); font-size:10px; letter-spacing:.22em; text-transform:uppercase; font-weight:600;
+    border-top:1px solid var(--line); margin-top:20px; background:linear-gradient(180deg,var(--bg),var(--cream))}
   .app-foot .foot-note{font-size:11px; letter-spacing:0; text-transform:none; font-weight:400; font-style:italic; color:var(--ink-soft); margin-top:14px; line-height:1.5}
   .app-foot .contact{text-transform:none; letter-spacing:0; font-weight:400}
   .app-foot .contact-name{font-family:var(--serif); font-size:15px; color:var(--ink); margin-bottom:8px; letter-spacing:.01em}
@@ -114,7 +127,8 @@
   .err{color:var(--bad); font-size:14px; margin-top:10px}
   .warn{color:var(--gold); font-size:12.5px; margin-top:8px}
 
-  .subject{background:linear-gradient(180deg,#fffdfb,var(--cream)); border:1px solid var(--line); border-radius:20px; padding:24px 22px; box-shadow:var(--shadow-lg)}
+  .subject{background:linear-gradient(180deg,#fffdfb,#f7f3ed); border:1px solid var(--line); border-radius:22px; padding:26px 24px;
+    box-shadow:0 8px 32px rgba(43,41,38,.1), 0 1px 0 rgba(255,255,255,.8) inset}
   .subject .addr{font-family:var(--serif); font-size:20px; font-weight:500; margin:0; line-height:1.25; letter-spacing:-.005em}
   .subject .facts{display:flex; gap:16px; flex-wrap:wrap; margin-top:8px; color:var(--ink-soft); font-size:13px}
   .attr-edit{display:flex; gap:8px; align-items:flex-end; margin-top:12px; flex-wrap:wrap}
@@ -176,9 +190,13 @@
   .loading{text-align:center; color:var(--ink-soft); padding:30px; font-style:italic}
   .count-pill{font-size:11px; color:var(--ink-soft); text-align:right; margin-top:10px}
 
-  .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--ink); color:#fff; padding:11px 18px; border-radius:100px; font-size:13px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:50; max-width:90%; text-align:center}
-  .toast.show{opacity:1}
-  .back{background:none; border:none; color:var(--slate); font-size:13px; letter-spacing:.06em; text-transform:uppercase; font-weight:600; padding:0; margin-bottom:14px}
+  .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(8px); background:linear-gradient(170deg,#2a3d45,#1a2429); color:#fff;
+    padding:12px 22px; border-radius:100px; font-size:13px; font-weight:500; opacity:0; transition:all .25s ease; pointer-events:none; z-index:50; max-width:90%; text-align:center;
+    box-shadow:0 8px 24px rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.08)}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .back{background:var(--cream); border:1.5px solid var(--line); color:var(--slate-deep); font-size:12px; letter-spacing:.06em; text-transform:uppercase; font-weight:600;
+    padding:8px 16px; margin-bottom:16px; border-radius:100px; transition:all .2s ease; box-shadow:0 1px 4px rgba(43,41,38,.04)}
+  .back:hover{background:var(--bg); border-color:var(--slate); box-shadow:0 3px 8px rgba(43,41,38,.08)}
 
   /* Share preview */
   .share-preview{border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); margin-top:10px}
