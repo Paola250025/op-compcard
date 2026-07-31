@@ -990,6 +990,7 @@ function pickPipeline(btn){ document.querySelectorAll('#pipelineRow .pipe-btn').
 // ===== Speech recognition =====
 let recognition=null, isRecording=false, recStartTime=null, recTimerInterval=null;
 let segments=[], interimText='';
+let recSession=0, processedKeys=new Set();
 
 function initSpeech(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -1003,9 +1004,21 @@ function initSpeech(){
       if(e.results[i].isFinal){
         const trimmed=t.trim();
         if(!trimmed) continue;
-        const elapsed=Math.floor((Date.now()-recStartTime)/1000);
-        const last=segments.length?segments[segments.length-1]:null;
-        if(last && last.text===trimmed && Math.abs(elapsed-last.time)<4) continue;
+        var key=recSession+':'+i;
+        if(processedKeys.has(key)) continue;
+        processedKeys.add(key);
+        var elapsed=Math.floor((Date.now()-recStartTime)/1000);
+        var last=segments.length?segments[segments.length-1]:null;
+        if(last){
+          if(last.text===trimmed) continue;
+          var lo=last.text.toLowerCase(), tr=trimmed.toLowerCase();
+          if(lo.indexOf(tr)>=0 || tr.indexOf(lo)>=0) continue;
+          var lastWords=lo.split(/\s+/), newWords=tr.split(/\s+/);
+          var overlap=0; for(var w=1;w<=Math.min(lastWords.length,newWords.length,6);w++){
+            if(lastWords.slice(-w).join(' ')===newWords.slice(0,w).join(' ')) overlap=w;
+          }
+          if(overlap>0){ trimmed=newWords.slice(overlap).join(' '); if(!trimmed) continue; }
+        }
         segments.push({time:elapsed, text:trimmed});
         interimText='';
       } else { interim+=t; }
@@ -1015,9 +1028,16 @@ function initSpeech(){
   };
   r.onerror=function(e){
     if(e.error==='not-allowed'){ toast('Microphone access denied. Check your browser settings.'); stopRec(); }
-    else if(e.error!=='no-speech' && isRecording){ try{r.start();}catch(ex){} }
+    else if(e.error!=='no-speech' && isRecording){
+      setTimeout(function(){ if(isRecording) try{r.start();}catch(ex){} },500);
+    }
   };
-  r.onend=function(){ if(isRecording) try{r.start();}catch(ex){} };
+  r.onend=function(){
+    if(isRecording){
+      recSession++; processedKeys.clear();
+      setTimeout(function(){ if(isRecording) try{r.start();}catch(ex){} },500);
+    }
+  };
   return r;
 }
 
@@ -1088,13 +1108,28 @@ function saveRecording(){
   const title=document.getElementById('recTitle').value.trim()||'Untitled meeting';
   const participants=document.getElementById('recParticipants').value.trim();
   const duration=recStartTime?Math.floor((Date.now()-recStartTime)/1000):0;
+  const summary=buildSummary(segments, title, recType);
   const meeting={id:Date.now(), title:title, participants:participants, type:recType,
-    date:new Date().toISOString(), duration:duration, segments:segments.slice(), summary:'', pipeline:'lead'};
+    date:new Date().toISOString(), duration:duration, segments:segments.slice(), summary:summary, pipeline:'lead'};
   const meetings=getMeetings(); meetings.unshift(meeting);
   lsSet('opcc_meetings',JSON.stringify(meetings));
   toast('Note saved');
   currentNoteId=meeting.id;
   openNote(0);
+}
+
+function buildSummary(segs, title, type){
+  if(!segs.length) return '';
+  var lines=[];
+  var label=type?type.charAt(0).toUpperCase()+type.slice(1).replace(/-/g,' '):'Note';
+  lines.push(label+': '+title);
+  lines.push('');
+  var meaningful=segs.filter(function(s){return s.text.split(/\s+/).length>3;});
+  var source=meaningful.length?meaningful:segs;
+  var count=Math.min(source.length, 10);
+  for(var i=0;i<count;i++) lines.push('- '+source[i].text);
+  if(source.length>count) lines.push('- ...('+source.length+' points total)');
+  return lines.join('\n');
 }
 
 function getMeetings(){ try{return JSON.parse(lsGet('opcc_meetings')||'[]');}catch(e){return [];} }
