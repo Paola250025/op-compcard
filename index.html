@@ -1048,26 +1048,17 @@ function initSpeech(){
   r.onresult=function(e){
     let interim='';
     for(let i=e.resultIndex;i<e.results.length;i++){
-      const t=e.results[i][0].transcript;
+      var t=e.results[i][0].transcript;
       if(e.results[i].isFinal){
-        const trimmed=t.trim();
-        if(!trimmed) continue;
+        var txt=t.trim();
+        if(!txt) continue;
         var key=recSession+':'+i;
         if(processedKeys.has(key)) continue;
         processedKeys.add(key);
         var elapsed=Math.floor((Date.now()-recStartTime)/1000);
         var last=segments.length?segments[segments.length-1]:null;
-        if(last){
-          if(last.text===trimmed) continue;
-          var lo=last.text.toLowerCase(), tr=trimmed.toLowerCase();
-          if(lo.indexOf(tr)>=0 || tr.indexOf(lo)>=0) continue;
-          var lastWords=lo.split(/\s+/), newWords=tr.split(/\s+/);
-          var overlap=0; for(var w=1;w<=Math.min(lastWords.length,newWords.length,6);w++){
-            if(lastWords.slice(-w).join(' ')===newWords.slice(0,w).join(' ')) overlap=w;
-          }
-          if(overlap>0){ trimmed=newWords.slice(overlap).join(' '); if(!trimmed) continue; }
-        }
-        segments.push({time:elapsed, text:trimmed});
+        if(last && last.text===txt) continue;
+        segments.push({time:elapsed, text:txt});
         interimText='';
       } else { interim+=t; }
     }
