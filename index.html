@@ -1001,8 +1001,12 @@ function initSpeech(){
     for(let i=e.resultIndex;i<e.results.length;i++){
       const t=e.results[i][0].transcript;
       if(e.results[i].isFinal){
+        const trimmed=t.trim();
+        if(!trimmed) continue;
         const elapsed=Math.floor((Date.now()-recStartTime)/1000);
-        segments.push({time:elapsed, text:t.trim()});
+        const last=segments.length?segments[segments.length-1]:null;
+        if(last && last.text===trimmed && Math.abs(elapsed-last.time)<4) continue;
+        segments.push({time:elapsed, text:trimmed});
         interimText='';
       } else { interim+=t; }
     }
