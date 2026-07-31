@@ -286,8 +286,12 @@
   .pipe-btn{background:var(--bg); border:1.5px solid var(--line); border-radius:100px; padding:8px 14px; font-size:11px; font-weight:600; color:var(--ink-soft); letter-spacing:.03em; transition:all .2s ease;
     box-shadow:0 1px 4px rgba(43,41,38,.04)}
   .pipe-btn:hover{border-color:var(--taupe); transform:translateY(-1px)}
-  .pipe-btn.active{border-color:transparent; background:linear-gradient(180deg,#6e8f9c,var(--slate-deep)); color:#fff;
-    box-shadow:0 3px 10px rgba(76,101,112,.28), inset 0 1px 0 rgba(255,255,255,.1)}
+  .pipe-btn.active{border-color:transparent; color:#fff;
+    box-shadow:0 3px 10px rgba(76,101,112,.28), inset 0 1px 0 rgba(255,255,255,.1); transform:translateY(-1px)}
+  .pipe-btn[data-pipe="lead"].active{background:linear-gradient(180deg,#5a9e6f,#3d7a50)}
+  .pipe-btn[data-pipe="follow-up"].active{background:linear-gradient(180deg,#c49044,#9e6e2a)}
+  .pipe-btn[data-pipe="contract"].active{background:linear-gradient(180deg,#5a7db5,#3e5d8a)}
+  .pipe-btn[data-pipe="closed"].active{background:linear-gradient(180deg,#7a7570,#5a5550)}
   .full-transcript{border:1px solid var(--line); border-radius:14px; background:var(--cream); padding:16px; max-height:400px; overflow-y:auto; font-size:13.5px; line-height:1.65; color:var(--ink)}
   .full-transcript .seg{margin-bottom:6px}
   .full-transcript .seg-time{font-size:10px; color:var(--taupe); font-variant-numeric:tabular-nums; display:inline-block; min-width:42px; font-weight:600}
@@ -446,7 +450,7 @@
       <button class="back" onclick="cancelRecording()">&larr; Back</button>
       <div class="rec-setup">
         <div class="af"><label>Meeting title</label><input type="text" id="recTitle" placeholder="e.g. Showing at 123 Main St"></div>
-        <div class="af"><label>Participants</label><input type="text" id="recParticipants" placeholder="e.g. Olaf, Paola, Client Name"></div>
+        <div class="af"><label>People &amp; context</label><input type="text" id="recParticipants" placeholder="e.g. Olaf, client John, at 123 Main St"></div>
         <div class="af">
           <label>Type</label>
           <div class="type-row" id="typeRow">
@@ -493,7 +497,7 @@
         </div>
       </div>
       <div class="note-section">
-        <div class="ns-label">Participants</div>
+        <div class="ns-label">People &amp; context</div>
         <p id="ndParticipants" style="font-size:14px; color:var(--ink-soft); margin:0"></p>
       </div>
       <div class="note-section">
@@ -1038,7 +1042,7 @@ function switchTab(tab){
 let recType='showing';
 let currentNoteId=null;
 function pickType(btn){ document.querySelectorAll('#typeRow .type-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); recType=btn.dataset.type; }
-function pickPipeline(btn){ document.querySelectorAll('#pipelineRow .pipe-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); autoSaveNote(); }
+function pickPipeline(btn){ document.querySelectorAll('#pipelineRow .pipe-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); autoSaveNote(); toast('Pipeline: '+btn.textContent.trim()); }
 
 // ===== Speech recognition =====
 let recognition=null, isRecording=false, recStartTime=null, recTimerInterval=null;
