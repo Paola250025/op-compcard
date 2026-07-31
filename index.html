@@ -375,16 +375,16 @@
 
     <!-- NOTES HOME -->
     <div id="notesHomeScreen" class="screen hidden">
-      <span class="eyebrow">Meeting notes</span>
-      <p class="home-intro">Record in-person meetings with live transcription. Organize, summarize, and share instantly.</p>
-      <button class="btn" onclick="newMeeting()" style="margin-top:8px">New meeting</button>
+      <span class="eyebrow">Notes</span>
+      <p class="home-intro">Record any conversation with live transcription, then organize and share it.</p>
+      <button class="btn" onclick="newMeeting()" style="margin-top:8px">Record</button>
 
-      <div class="section-label"><span class="eyebrow">Recent meetings</span></div>
+      <div class="section-label"><span class="eyebrow">Saved notes</span></div>
       <ul id="meetingsList" class="meetings"></ul>
       <div id="meetingsEmpty" class="empty-state">
         <div class="es-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
-        <p class="es-title">No meetings yet</p>
-        <p class="es-sub">Tap &ldquo;New meeting&rdquo; to start recording with live transcription.</p>
+        <p class="es-title">No notes yet</p>
+        <p class="es-sub">Tap &ldquo;Record&rdquo; to start a live transcription.</p>
       </div>
     </div>
 
@@ -414,7 +414,7 @@
       <div class="transcript-box" id="liveTranscript"><div class="transcript-empty">Transcript will appear here as you speak&hellip;</div></div>
       <div class="btn-row" style="margin-top:18px">
         <button class="btn ghost" onclick="cancelRecording()">Cancel</button>
-        <button class="btn" id="saveRecBtn" onclick="saveRecording()" disabled>Save meeting</button>
+        <button class="btn" id="saveRecBtn" onclick="saveRecording()" disabled>Save note</button>
       </div>
     </div>
 
@@ -1088,7 +1088,7 @@ function saveRecording(){
     date:new Date().toISOString(), duration:duration, segments:segments.slice(), summary:'', pipeline:'lead'};
   const meetings=getMeetings(); meetings.unshift(meeting);
   lsSet('opcc_meetings',JSON.stringify(meetings));
-  toast('Meeting saved');
+  toast('Note saved');
   currentNoteId=meeting.id;
   openNote(0);
 }
@@ -1150,10 +1150,10 @@ function autoSaveNote(){
 
 function deleteNote(){
   if(!currentNoteId) return;
-  if(!confirm('Delete this meeting note?')) return;
+  if(!confirm('Delete this note?')) return;
   const meetings=getMeetings().filter(function(m){return m.id!==currentNoteId;});
   lsSet('opcc_meetings',JSON.stringify(meetings));
-  currentNoteId=null; toast('Meeting deleted');
+  currentNoteId=null; toast('Note deleted');
   showOnly('notesHomeScreen'); renderMeetings();
 }
 
